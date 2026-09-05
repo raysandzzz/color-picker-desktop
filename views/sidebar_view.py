@@ -24,7 +24,7 @@ class SidebarView(tk.Frame):
 
         title = tk.Label(
             header_frame,
-            text="Pastel Palette",
+            text="Color Picker",
             font=config.FONT_TITLE,
             bg=config.COLOR_SIDEBAR,
             fg=config.COLOR_TEXT_MAIN,
@@ -33,7 +33,7 @@ class SidebarView(tk.Frame):
 
         btn_new = tk.Button(
             self,
-            text="+ New Canvas",
+            text="+ New Palette",
             font=config.FONT_SUBTITLE,
             bg=config.COLOR_ACCENT,
             fg="#FFFFFF",
@@ -48,7 +48,7 @@ class SidebarView(tk.Frame):
 
         lbl_section = tk.Label(
             self,
-            text="RECENT PROJECTS",
+            text="SAVED PALETTES",
             font=config.FONT_BADGE,
             bg=config.COLOR_SIDEBAR,
             fg=config.COLOR_TEXT_MUTED,
@@ -69,7 +69,7 @@ class SidebarView(tk.Frame):
         if not projects:
             empty_lbl = tk.Label(
                 self.list_container,
-                text="No projects yet.\nClick '+ New Canvas' to start.",
+                text="No projects yet.\nClick '+ New Palette' to start.",
                 font=config.FONT_NORMAL,
                 bg=config.COLOR_SIDEBAR,
                 fg=config.COLOR_TEXT_MUTED,
@@ -131,9 +131,27 @@ class SidebarView(tk.Frame):
         if not file_path:
             return
 
-        name = simpledialog.askstring("Project Name", "Enter a name for this canvas:", initialvalue="New Canvas")
-        if name is None:
-            return
+        name = "New Palettes"
+        while True:
+            name = simpledialog.askstring("Palette Name", "Enter a name for this canvas:", initialvalue=name)
+            if name is None:  # Presionó Cancel
+                return
+
+            clean_name = name.strip()
+            if not clean_name:
+                messagebox.showwarning("Invalid Name", "Palette name cannot be empty.")
+                name = "New Palette"
+                continue
+
+            if self.pm.project_name_exists(clean_name):
+                messagebox.showwarning(
+                    "Name In Use",
+                    f"A palette named '{clean_name}' already exists. Please choose a different name."
+                )
+                continue
+
+            # Nombre válido y no duplicado
+            break
 
         project = self.pm.create_project(name, file_path)
         self.refresh_list()

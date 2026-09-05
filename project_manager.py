@@ -19,6 +19,11 @@ class ProjectManager:
         if self.projects:
             self.active_project_id = self.projects[0]["id"]
 
+    def project_name_exists(self, name: str) -> bool:
+        """Verifica si ya existe un proyecto con el mismo nombre."""
+        normalized = name.strip().lower()
+        return any(p["name"].strip().lower() == normalized for p in self.projects)
+    
     def _load_data(self) -> list[dict]:
         """Carga la lista de proyectos desde el JSON."""
         if not os.path.exists(self.filepath):

@@ -4,7 +4,6 @@ Punto de entrada principal para Pastel Color Picker & Palette Extractor.
 
 import ctypes
 import os
-import sys
 import tkinter as tk
 
 import config
@@ -38,7 +37,7 @@ class ColorPickerApp(tk.Tk):
         self.main_container = tk.Frame(self, bg=config.COLOR_BG_DARK)
         self.main_container.pack(fill="both", expand=True)
 
-        # Montar Workspace a la derecha
+        # Montar W  orkspace a la derecha
         self.workspace = WorkspaceView(
             self.main_container,
             project_manager=self.pm,
