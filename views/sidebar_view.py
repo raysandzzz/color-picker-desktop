@@ -18,6 +18,85 @@ class SidebarView(tk.Frame):
         self._build_project_list()
         self.refresh_list()
 
+    def _prompt_palette_name(self, initial_value: str = "New Palette") -> str | None:
+        """Modal con dimensiones fijas y estilo consistente para ingresar el nombre."""
+        dialog = tk.Toplevel(self)
+        dialog.title("Palette Name")
+        dialog.geometry("360x150")
+        dialog.resizable(False, False)
+        dialog.configure(bg=config.COLOR_BG_DARK)
+        dialog.transient(self.winfo_toplevel())
+        dialog.grab_set()
+
+        # Centrar relativo a la ventana principal
+        root_x = self.winfo_toplevel().winfo_x()
+        root_y = self.winfo_toplevel().winfo_y()
+        root_w = self.winfo_toplevel().winfo_width()
+        root_h = self.winfo_toplevel().winfo_height()
+        pos_x = root_x + (root_w // 2) - 180
+        pos_y = root_y + (root_h // 2) - 75
+        dialog.geometry(f"+{pos_x}+{pos_y}")
+
+        result = {"name": None}
+
+        lbl = tk.Label(
+            dialog,
+            text="Enter a name for this palette:",
+            font=config.FONT_NORMAL,
+            bg=config.COLOR_BG_DARK,
+            fg=config.COLOR_TEXT_MAIN,
+        )
+        lbl.pack(anchor="w", padx=20, pady=(16, 8))
+
+        entry = tk.Entry(dialog, font=config.FONT_NORMAL, relief="solid", bd=1)
+        entry.pack(fill="x", padx=20, ipady=3)
+        entry.insert(0, initial_value)
+        entry.select_range(0, tk.END)
+        entry.focus_set()
+
+        btn_frame = tk.Frame(dialog, bg=config.COLOR_BG_DARK)
+        btn_frame.pack(fill="x", padx=20, pady=(16, 12))
+
+        def confirm(event=None):
+            result["name"] = entry.get()
+            dialog.destroy()
+
+        def cancel(event=None):
+            dialog.destroy()
+
+        btn_cancel = tk.Button(
+            btn_frame,
+            text="Cancel",
+            font=config.FONT_NORMAL,
+            bg=config.COLOR_BG_DARK,
+            fg=config.COLOR_TEXT_MUTED,
+            relief="flat",
+            cursor="hand2",
+            padx=10,
+            command=cancel,
+        )
+        btn_cancel.pack(side="right", padx=(6, 0))
+
+        btn_ok = tk.Button(
+            btn_frame,
+            text="Confirm",
+            font=config.FONT_SUBTITLE,
+            bg=config.COLOR_ACCENT,
+            fg="#FFFFFF",
+            relief="flat",
+            cursor="hand2",
+            padx=12,
+            pady=2,
+            command=confirm,
+        )
+        btn_ok.pack(side="right")
+
+        dialog.bind("<Return>", confirm)
+        dialog.bind("<Escape>", cancel)
+
+        self.wait_window(dialog)
+        return result["name"]
+    
     def _build_header(self):
         header_frame = tk.Frame(self, bg=config.COLOR_SIDEBAR)
         header_frame.pack(fill="x", padx=14, pady=(16, 10))
@@ -33,7 +112,7 @@ class SidebarView(tk.Frame):
 
         btn_new = tk.Button(
             self,
-            text="+ New Palette",
+            text="➕ New Palette",
             font=config.FONT_SUBTITLE,
             bg=config.COLOR_ACCENT,
             fg="#FFFFFF",
@@ -42,7 +121,7 @@ class SidebarView(tk.Frame):
             relief="flat",
             cursor="hand2",
             pady=6,
-            command=self._on_new_canvas_clicked,
+            command=self._on_new_palette_clicked,
         )
         btn_new.pack(fill="x", padx=14, pady=(6, 14))
 
@@ -96,7 +175,7 @@ class SidebarView(tk.Frame):
             )
             name_lbl.pack(side="left", fill="x", expand=True, padx=(8, 2), pady=6)
 
-            # Botón para borrar el canvas/proyecto
+            # Botón para borrar la paleta anteriormente extraida
             btn_del = tk.Label(
                 row,
                 text="✕",
@@ -124,16 +203,16 @@ class SidebarView(tk.Frame):
         self.refresh_list()
         self.on_project_selected()
 
-    def _on_new_canvas_clicked(self):
+    def _on_new_palette_clicked(self):
         file_types = [("Image files", "*.png;*.jpg;*.jpeg;*.bmp;*.webp")]
         file_path = filedialog.askopenfilename(title="Select an Image", filetypes=file_types)
 
         if not file_path:
             return
 
-        name = "New Palettes"
+        name = "New Palette"
         while True:
-            name = simpledialog.askstring("Palette Name", "Enter a name for this canvas:", initialvalue=name)
+            name = self._prompt_palette_name(name)
             if name is None:  # Presionó Cancel
                 return
 

@@ -5,10 +5,10 @@ Tema: Pastel Sage / Mint Green.
 
 # Ventana principal
 APP_TITLE = "Color Picker"
-WINDOW_WIDTH = 980
-WINDOW_HEIGHT = 650
-MIN_WIDTH = 800
-MIN_HEIGHT = 550
+WINDOW_WIDTH = 920
+WINDOW_HEIGHT = 680
+MIN_WIDTH = 920
+MIN_HEIGHT = 680
 
 # Paleta Pastel Green
 COLOR_BG_DARK = "#E9EFE9"        # Fondo suave general

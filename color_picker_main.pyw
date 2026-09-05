@@ -1,5 +1,5 @@
 """
-Punto de entrada principal para Pastel Color Picker & Palette Extractor.
+Punto de entrada principal para Color Picker & Palette Extractor.
 """
 
 import ctypes

@@ -43,7 +43,7 @@ class ProjectManager:
         """Crea y registra un nuevo proyecto con su imagen asociada."""
         project = {
             "id": str(uuid.uuid4())[:8],
-            "name": name.strip() or "Untitled Canvas",
+            "name": name.strip() or "Untitled Palette",
             "image_path": image_path,
             "palette": [],  # Lista ordenada de strings HEX
         }
