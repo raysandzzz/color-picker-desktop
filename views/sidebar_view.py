@@ -3,7 +3,7 @@ Vista del sidebar lateral para navegación de proyectos y creación de lienzos.
 """
 
 import tkinter as tk
-from tkinter import simpledialog, filedialog, messagebox
+from tkinter import filedialog, messagebox
 import config
 
 
@@ -135,8 +135,72 @@ class SidebarView(tk.Frame):
         lbl_section.pack(anchor="w", padx=14, pady=(4, 6))
 
     def _build_project_list(self):
-        self.list_container = tk.Frame(self, bg=config.COLOR_SIDEBAR)
-        self.list_container.pack(fill="both", expand=True, padx=8, pady=(0, 10))
+        # 1. Marco exterior
+        self.scroll_container = tk.Frame(self, bg=config.COLOR_SIDEBAR)
+        self.scroll_container.pack(fill="both", expand=True, padx=8, pady=(0, 10))
+
+        # 2. Scrollbar vertical
+        self.sidebar_scrollbar = tk.Scrollbar(
+            self.scroll_container, orient="vertical"
+        )
+
+        # 3. Canvas intermedio para permitir el desplazamiento
+        self.list_canvas = tk.Canvas(
+            self.scroll_container,
+            bg=config.COLOR_SIDEBAR,
+            highlightthickness=0,
+            yscrollcommand=self.sidebar_scrollbar.set,
+        )
+        self.sidebar_scrollbar.config(command=self.list_canvas.yview)
+
+        self.list_canvas.pack(side="left", fill="both", expand=True)
+
+        # 4. El contenedor real donde se añaden los proyectos (mismo nombre para compatibilidad)
+        self.list_container = tk.Frame(self.list_canvas, bg=config.COLOR_SIDEBAR)
+        self.list_window_id = self.list_canvas.create_window(
+            (0, 0), window=self.list_container, anchor="nw"
+        )
+
+        # 5. Eventos para ajustar dimensiones y el scroll con la rueda
+        self.list_container.bind("<Configure>", self._on_list_configure)
+        self.list_canvas.bind("<Configure>", self._on_canvas_configure)
+
+        self.list_canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.list_container.bind("<MouseWheel>", self._on_mousewheel)
+
+    def _on_canvas_configure(self, event):
+        """Mantiene el frame de proyectos con el mismo ancho que el canvas."""
+        self.list_canvas.itemconfig(self.list_window_id, width=event.width)
+
+    def _on_list_configure(self, event=None):
+        """Muestra u oculta la barra de desplazamiento según el desbordamiento."""
+        bbox = self.list_canvas.bbox("all")
+        if not bbox:
+            return
+
+        content_height = bbox[3] - bbox[1]
+        visible_height = self.list_canvas.winfo_height()
+
+        if content_height <= visible_height:
+            self.list_canvas.configure(scrollregion=(0, 0, bbox[2], visible_height))
+            self.list_canvas.yview_moveto(0)
+            self.sidebar_scrollbar.pack_forget()
+        else:
+            self.list_canvas.configure(scrollregion=bbox)
+            if not self.sidebar_scrollbar.winfo_ismapped():
+                self.sidebar_scrollbar.pack(side="right", fill="y")
+
+    def _on_mousewheel(self, event):
+        """Permite deslizar la lista verticalmente con la rueda."""
+        bbox = self.list_canvas.bbox("all")
+        if not bbox:
+            return
+
+        content_height = bbox[3] - bbox[1]
+        visible_height = self.list_canvas.winfo_height()
+
+        if content_height > visible_height:
+            self.list_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def refresh_list(self):
         for widget in self.list_container.winfo_children():
@@ -164,18 +228,8 @@ class SidebarView(tk.Frame):
 
             row = tk.Frame(self.list_container, bg=bg_color, cursor="hand2")
             row.pack(fill="x", pady=2, padx=4)
-
-            name_lbl = tk.Label(
-                row,
-                text=p["name"],
-                font=config.FONT_NORMAL,
-                bg=bg_color,
-                fg=fg_color,
-                anchor="w",
-            )
-            name_lbl.pack(side="left", fill="x", expand=True, padx=(8, 2), pady=6)
-
-            # Botón para borrar la paleta anteriormente extraida
+            
+            # 1. Empacar PRIMERO el botón de borrar a la derecha para que nunca sea desplazado
             btn_del = tk.Label(
                 row,
                 text="✕",
@@ -187,11 +241,32 @@ class SidebarView(tk.Frame):
             )
             btn_del.pack(side="right", padx=(0, 4))
 
+            # 2. Si el nombre es muy largo, se corta con los puntos suspensivos
+            raw_name = p["name"]
+            display_name = raw_name if len(raw_name) <= 22 else raw_name[:20].rstrip() + "..."
+
+            # 3. Empacar el Label con el texto truncado en el espacio sobrante
+            name_lbl = tk.Label(
+                row,
+                text=display_name,
+                font=config.FONT_NORMAL,
+                bg=bg_color,
+                fg=fg_color,
+                anchor="w",
+            )
+            name_lbl.pack(side="left", fill="x", expand=True, padx=(8, 2), pady=6)
+
             # Eventos
             row.bind("<Button-1>", lambda e, pid=p["id"]: self._select_project(pid))
             name_lbl.bind("<Button-1>", lambda e, pid=p["id"]: self._select_project(pid))
             btn_del.bind("<Button-1>", lambda e, pid=p["id"], name=p["name"]: self._on_delete_project_clicked(pid, name))
 
+            # Propagar scroll de la rueda del ratón
+            row.bind("<MouseWheel>", self._on_mousewheel)
+            name_lbl.bind("<MouseWheel>", self._on_mousewheel)
+            btn_del.bind("<MouseWheel>", self._on_mousewheel)
+            
+            
     def _on_delete_project_clicked(self, project_id: str, name: str):
         if messagebox.askyesno("Delete Canvas", f"Are you sure you want to delete '{name}'?"):
             self.pm.delete_project(project_id)

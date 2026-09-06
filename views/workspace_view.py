@@ -1,7 +1,7 @@
 """
 Área de trabajo: renderizado de imagen con zoom adaptativo, cuentagotas y grid de colores.
 """
-from tkinter import messagebox, ttk
+from tkinter import ttk
 import os
 import tkinter as tk
 import config
@@ -17,6 +17,7 @@ class WorkspaceView(tk.Frame):
         self.current_original_img = None
         self.current_tk_img = None
         self.current_scale = 1.0
+        self.loupe_enabled = tk.BooleanVar(value=True)
 
         self._build_ui()
 
@@ -62,6 +63,10 @@ class WorkspaceView(tk.Frame):
         self.canvas.pack(fill="both", expand=True, padx=4, pady=4)
         self.canvas.bind("<Button-1>", self._on_canvas_clicked)
         self.canvas.bind("<Configure>", self._on_canvas_resize)
+        
+        # Eventos para una lupa minimalista XD
+        self.canvas.bind("<Motion>", self._on_mouse_move)
+        self.canvas.bind("<Leave>", self._on_mouse_leave)
 
         # 3. Barra de acciones (Herramientas)
         self.toolbar_frame = tk.Frame(self, bg=config.COLOR_BG_DARK)
@@ -103,6 +108,22 @@ class WorkspaceView(tk.Frame):
             command=self._clear_palette,
         )
         self.btn_clear.pack(side="left")
+        
+        # Button para activar o desactivar la lupa
+        self.chk_loupe = tk.Checkbutton(
+            self.toolbar_frame,
+            text="🔍 Inspector",
+            variable=self.loupe_enabled,
+            command=self._on_toggle_loupe,
+            font=config.FONT_BADGE,
+            bg=config.COLOR_BG_DARK,
+            fg=config.COLOR_TEXT_MAIN,
+            activebackground=config.COLOR_BG_DARK,
+            activeforeground=config.COLOR_TEXT_MAIN,
+            selectcolor=config.COLOR_CARD_BG,
+            cursor="hand2",
+        )
+        self.chk_loupe.pack(side="left", padx=(10, 0))
 
         # 4. Contenedor Scrolleable para Swatches
         self.swatches_outer = tk.Frame(self, bg=config.COLOR_BG_DARK, height=78)
@@ -346,3 +367,78 @@ class WorkspaceView(tk.Frame):
     def _show_feedback(self, msg: str):
         self.lbl_feedback.config(text=msg)
         self.after(2200, lambda: self.lbl_feedback.config(text=""))
+        
+    def _on_mouse_move(self, event):
+        """Muestra una mirilla minimalista con el color y HEX en tiempo real."""
+        if not self.loupe_enabled.get():
+            return
+
+        if not self.current_original_img or not self.current_tk_img:
+            return
+
+        bbox = self.canvas.bbox("main_img")
+        if not bbox:
+            self.canvas.delete("loupe")
+            return        
+        
+        x1, y1, x2, y2 = bbox
+
+        # Si el cursor está dentro de la imagen
+        if x1 <= event.x <= x2 and y1 <= event.y <= y2:
+            rel_x = event.x - x1
+            rel_y = event.y - y1
+            hex_color = color_engine.get_color_at_pixel(
+                self.current_original_img, rel_x, rel_y, self.current_scale
+            )
+
+            # Posición flotante (offset hacia arriba y a la derecha del cursor)
+            lx = event.x + 24
+            ly = event.y - 24
+
+            # Evitar que se desborde del canvas por arriba o derecha
+            c_w = self.canvas.winfo_width()
+            if lx + 70 > c_w:
+                lx = event.x - 70
+            if ly - 20 < 0:
+                ly = event.y + 24
+
+            # Redibujar la mini-píldora
+            self.canvas.delete("loupe")
+
+            # 1. Pastilla de fondo oscura/sutil
+            self.canvas.create_rectangle(
+                lx, ly - 14, lx + 76, ly + 14,
+                fill="#1E201E",
+                outline="#3A3D3A",
+                width=1,
+                tags="loupe"
+            )
+
+            # 2. Círculo que muestra la muestra de color
+            self.canvas.create_oval(
+                lx + 5, ly - 7, lx + 19, ly + 7,
+                fill=hex_color,
+                outline="#FFFFFF",
+                width=1,
+                tags="loupe"
+            )
+
+            # 3. Código HEX en texto fino
+            self.canvas.create_text(
+                lx + 46, ly,
+                text=hex_color.upper(),
+                fill="#EDEDED",
+                font=("Segoe UI", 8, "bold"),
+                tags="loupe"
+            )
+        else:
+            self.canvas.delete("loupe")
+
+    def _on_toggle_loupe(self):
+        """Limpia la mirilla si el usuario la desactiva con el cursor encima."""
+        if not self.loupe_enabled.get():
+            self.canvas.delete("loupe")
+    
+    def _on_mouse_leave(self, event=None):
+        """Oculta la lupa cuando el ratón sale del área del canvas."""
+        self.canvas.delete("loupe")
