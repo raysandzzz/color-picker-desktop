@@ -58,6 +58,10 @@ color-picker-desktop/
 3. Extract the contents and double-click `ColorPicker.exe`.
 4. (Optional) You can add a desktop shortcut for added convenience :)
 
+> **Note on Windows SmartScreen / Defender:**  
+> Since this standalone binary is packaged with PyInstaller and is not digitally signed with a commercial certificate, Windows Defender or SmartScreen may flag it as an unrecognized file.  
+> You can safely proceed by clicking **"More info" → "Run anyway"**. The application runs completely offline and the full source code is inspectable in this repository.
+
 ---
 
 ## Development Setup
