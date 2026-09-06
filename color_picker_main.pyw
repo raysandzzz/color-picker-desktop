@@ -2,6 +2,7 @@
 Punto de entrada principal para Color Picker & Palette Extractor.
 """
 
+import sys
 import ctypes
 import os
 import tkinter as tk
@@ -10,6 +11,16 @@ import config
 from project_manager import ProjectManager
 from views.sidebar_view import SidebarView
 from views.workspace_view import WorkspaceView
+
+
+def get_asset_path(relative_path):
+    """Obtiene la ruta absoluta para desarrollo y para el ejecutable de PyInstaller."""
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
 
 # Configurar AppUserModelID para que Windows muestre el icono en la barra de tareas
 try:
@@ -29,7 +40,7 @@ class ColorPickerApp(tk.Tk):
         self.configure(bg=config.COLOR_BG_DARK)
 
         self._set_app_icon()
-
+        
         # Instanciar el gestor de datos
         self.pm = ProjectManager()
 
@@ -57,7 +68,12 @@ class ColorPickerApp(tk.Tk):
         self.workspace.load_active_project()
 
     def _set_app_icon(self):
-        base_dir = os.path.dirname(__file__)
+        # Determinar base_dir compatible con desarrollo y con PyInstaller
+        try:
+            base_dir = sys._MEIPASS
+        except AttributeError:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+
         ico_path = os.path.join(base_dir, "icon.ico")
         png_path = os.path.join(base_dir, "icon.png")
 
@@ -68,8 +84,8 @@ class ColorPickerApp(tk.Tk):
                 pass
         elif os.path.exists(png_path):
             try:
-                img = tk.PhotoImage(file=png_path)
-                self.iconphoto(True, img)
+                self._app_icon_img = tk.PhotoImage(file=png_path)  # Guardar referencia para evitar garbage collection
+                self.iconphoto(True, self._app_icon_img)
             except Exception:
                 pass
 
