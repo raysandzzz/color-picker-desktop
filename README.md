@@ -1,14 +1,12 @@
 # Color Picker
 
-A modular desktop application built with Python and Tkinter designed for precise color extraction, real-time pixel inspection, and project-based palette management.
-
----
+A modular desktop application built with Python and Tkinter designed for precise color extraction, real-time pixel inspection, and image-based palette management.
 
 ## Screenshots
 
 <div align="center">
   <p><strong>Main Workspace & Pixel Inspector</strong></p>
-  <img src="URL_QUE_TE_GENERO_GITHUB" alt="Color Picker Workspace" width="750">
+  <img src="https://github.com/user-attachments/assets/083c5c2e-1cbb-41bc-af79-4be40647748c" alt="Color Picker Workspace" width="750">
 </div>
 
 <br>
@@ -27,10 +25,12 @@ A modular desktop application built with Python and Tkinter designed for precise
 
 ## Detailed Views
 
-| Canvas & Magnifying Loupe | Palette Management |
+| Pixel Inspector | Palette Management |
 | :---: | :---: |
-| <img src="URL_LOUPE_AQUI" alt="Loupe Preview" width="400"> | <img src="URL_PALETA_AQUI" alt="Palette Preview" width="400"> |
-| *Real-time magnified pixel inspection with HEX readout* | *Project-based color saving and persistent palettes* |
+| <img src="https://github.com/user-attachments/assets/758ab103-c1e1-47f2-92c3-49adf41ebc24" alt="Loupe Preview" width="400"> | <img src="https://github.com/user-attachments/assets/f5e7d897-cf57-4402-8a26-49056ee36532" alt="Palette Preview" width="400"> |
+| *Precise coordinate picking with live HEX preview* | *Automatically generates dominant tones and manages color swatches* |
+
+---
 
 ## Architecture
 
@@ -47,13 +47,16 @@ color-picker-desktop/
 └── requirements.txt          # Python dependencies
 ```
 
+---
+
 ## Download & Run (Windows)
 
-No Python installation required.
+*No Python installation required.*
 
 1. Go to the [Releases](https://github.com/raysandzzz/color-picker-desktop/releases/latest) section.
 2. Download `ColorPicker-v1.0.0-windows.zip`.
 3. Extract the contents and double-click `ColorPicker.exe`.
+4. (Optional) You can add a desktop shortcut for added convenience :)
 
 ---
 
@@ -69,7 +72,7 @@ If you want to run or modify the source code locally:
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/TU_USUARIO/color-picker-desktop.git](https://github.com/TU_USUARIO/color-picker-desktop.git)
+   git clone https://github.com/raysandzzz/color-picker-desktop.git
    cd color-picker-desktop
    ```
 
@@ -94,8 +97,9 @@ If you want to run or modify the source code locally:
 ## Build Standalone Executable
 
 To compile into a standalone Windows binary using PyInstaller:
+
 ```powershell
-    pyinstaller --noconfirm --onedir --windowed --icon="icon.ico" --add-data "icon.ico;." --name="ColorPicker" color_picker_main.pyw
+pyinstaller --noconfirm --onedir --windowed --icon="icon.ico" --add-data "icon.ico;." --name="ColorPicker" color_picker_main.pyw
 ```
 
 The output will be generated inside the `dist/ColorPicker/` directory.
