@@ -22,6 +22,18 @@ def get_asset_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+# Activar DPI awareness en Windows
+if sys.platform == "win32":
+    try:
+        # Compatible con Windows 10/11
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+    except Exception:
+        try:
+            # Fallback para versiones anteriores de Windows
+            ctypes.windll.user32.SetProcessDPIAware()
+        except Exception:
+            pass
+
 # Configurar AppUserModelID para que Windows muestre el icono en la barra de tareas
 try:
     myappid = "pythonprojects.gui.pastelcolorpicker.1.0"
