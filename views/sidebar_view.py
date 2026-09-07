@@ -9,7 +9,7 @@ import config
 
 class SidebarView(tk.Frame):
     def __init__(self, parent, project_manager, on_project_selected):
-        super().__init__(parent, bg=config.COLOR_SIDEBAR, width=220)
+        super().__init__(parent, bg=self.tm.colors["sidebar"], width=220)
         self.pack_propagate(False)
         self.pm = project_manager
         self.on_project_selected = on_project_selected
@@ -24,7 +24,7 @@ class SidebarView(tk.Frame):
         dialog.title("Palette Name")
         dialog.geometry("360x150")
         dialog.resizable(False, False)
-        dialog.configure(bg=config.COLOR_BG_DARK)
+        dialog.configure(bg=self.tm.colors["bg"])
         dialog.transient(self.winfo_toplevel())
         dialog.grab_set()
 
@@ -43,7 +43,7 @@ class SidebarView(tk.Frame):
             dialog,
             text="Enter a name for this palette:",
             font=config.FONT_NORMAL,
-            bg=config.COLOR_BG_DARK,
+            bg=self.tm.colors["bg"],
             fg=config.COLOR_TEXT_MAIN,
         )
         lbl.pack(anchor="w", padx=20, pady=(16, 8))
@@ -54,7 +54,7 @@ class SidebarView(tk.Frame):
         entry.select_range(0, tk.END)
         entry.focus_set()
 
-        btn_frame = tk.Frame(dialog, bg=config.COLOR_BG_DARK)
+        btn_frame = tk.Frame(dialog, bg=self.tm.colors["bg"])
         btn_frame.pack(fill="x", padx=20, pady=(16, 12))
 
         def confirm(event=None):
@@ -68,8 +68,8 @@ class SidebarView(tk.Frame):
             btn_frame,
             text="Cancel",
             font=config.FONT_NORMAL,
-            bg=config.COLOR_BG_DARK,
-            fg=config.COLOR_TEXT_MUTED,
+            bg=self.tm.colors["bg"],
+            fg=self.tm.colors["text_2"],
             relief="flat",
             cursor="hand2",
             padx=10,
@@ -98,14 +98,14 @@ class SidebarView(tk.Frame):
         return result["name"]
     
     def _build_header(self):
-        header_frame = tk.Frame(self, bg=config.COLOR_SIDEBAR)
+        header_frame = tk.Frame(self, bg=self.tm.colors["sidebar"])
         header_frame.pack(fill="x", padx=14, pady=(16, 10))
 
         title = tk.Label(
             header_frame,
             text="Color Picker",
             font=config.FONT_TITLE,
-            bg=config.COLOR_SIDEBAR,
+            bg=self.tm.colors["sidebar"],
             fg=config.COLOR_TEXT_MAIN,
         )
         title.pack(anchor="w")
@@ -129,14 +129,14 @@ class SidebarView(tk.Frame):
             self,
             text="SAVED PALETTES",
             font=config.FONT_BADGE,
-            bg=config.COLOR_SIDEBAR,
-            fg=config.COLOR_TEXT_MUTED,
+            bg=self.tm.colors["sidebar"],
+            fg=self.tm.colors["text_2"],
         )
         lbl_section.pack(anchor="w", padx=14, pady=(4, 6))
 
     def _build_project_list(self):
         # 1. Marco exterior
-        self.scroll_container = tk.Frame(self, bg=config.COLOR_SIDEBAR)
+        self.scroll_container = tk.Frame(self, bg=self.tm.colors["sidebar"])
         self.scroll_container.pack(fill="both", expand=True, padx=8, pady=(0, 10))
 
         # 2. Scrollbar vertical
@@ -147,7 +147,7 @@ class SidebarView(tk.Frame):
         # 3. Canvas intermedio para permitir el desplazamiento
         self.list_canvas = tk.Canvas(
             self.scroll_container,
-            bg=config.COLOR_SIDEBAR,
+            bg=self.tm.colors["sidebar"],
             highlightthickness=0,
             yscrollcommand=self.sidebar_scrollbar.set,
         )
@@ -156,7 +156,7 @@ class SidebarView(tk.Frame):
         self.list_canvas.pack(side="left", fill="both", expand=True)
 
         # 4. El contenedor real donde se añaden los proyectos (mismo nombre para compatibilidad)
-        self.list_container = tk.Frame(self.list_canvas, bg=config.COLOR_SIDEBAR)
+        self.list_container = tk.Frame(self.list_canvas, bg=self.tm.colors["sidebar"])
         self.list_window_id = self.list_canvas.create_window(
             (0, 0), window=self.list_container, anchor="nw"
         )
@@ -169,7 +169,7 @@ class SidebarView(tk.Frame):
         self.list_container.bind("<MouseWheel>", self._on_mousewheel)
 
     def _on_canvas_configure(self, event):
-        """Mantiene el frame de proyectos con el mismo ancho que el canvas."""
+        """Mantiene el frame de palettes con el mismo ancho que el canvas."""
         self.list_canvas.itemconfig(self.list_window_id, width=event.width)
 
     def _on_list_configure(self, event=None):
@@ -212,10 +212,10 @@ class SidebarView(tk.Frame):
         if not projects:
             empty_lbl = tk.Label(
                 self.list_container,
-                text="No projects yet.\nClick '+ New Palette' to start.",
+                text="No palettes yet.\nClick '+ New Palette' to start.",
                 font=config.FONT_NORMAL,
-                bg=config.COLOR_SIDEBAR,
-                fg=config.COLOR_TEXT_MUTED,
+                bg=self.tm.colors["sidebar"],
+                fg=self.tm.colors["text_2"],
                 justify="center",
             )
             empty_lbl.pack(pady=20)
@@ -223,8 +223,8 @@ class SidebarView(tk.Frame):
 
         for p in projects:
             is_active = p["id"] == active_id
-            bg_color = config.COLOR_CARD_BG if is_active else config.COLOR_SIDEBAR
-            fg_color = config.COLOR_TEXT_MAIN if is_active else config.COLOR_TEXT_MUTED
+            bg_color = config.COLOR_CARD_BG if is_active else self.tm.colors["sidebar"]
+            fg_color = config.COLOR_TEXT_MAIN if is_active else self.tm.colors["text_2"]
 
             row = tk.Frame(self.list_container, bg=bg_color, cursor="hand2")
             row.pack(fill="x", pady=2, padx=4)
@@ -235,7 +235,7 @@ class SidebarView(tk.Frame):
                 text="✕",
                 font=("Segoe UI", 9),
                 bg=bg_color,
-                fg=config.COLOR_TEXT_MUTED,
+                fg=self.tm.colors["text_2"],
                 cursor="hand2",
                 padx=6,
             )

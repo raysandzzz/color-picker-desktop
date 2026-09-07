@@ -11,7 +11,7 @@ import config
 from project_manager import ProjectManager
 from views.sidebar_view import SidebarView
 from views.workspace_view import WorkspaceView
-
+from theme_manager import ThemeManager
 
 def get_asset_path(relative_path):
     """Obtiene la ruta absoluta para desarrollo y para el ejecutable de PyInstaller."""
@@ -49,18 +49,23 @@ class ColorPickerApp(tk.Tk):
         self.title(config.APP_TITLE)
         self.geometry(f"{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}")
         self.minsize(config.MIN_WIDTH, config.MIN_HEIGHT)
-        self.configure(bg=config.COLOR_BG_DARK)
+        
 
         self._set_app_icon()
         
-        # Instanciar el gestor de datos
+        # Instancia del gestor de datos
         self.pm = ProjectManager()
-
+        
+        # Instancia del gestor de tema
+        self.tm = ThemeManager(initial_theme=self.pm.theme_name)
+        
+        self.configure(bg=self.tm.colors["bg"])
+        
         # Contenedor principal
-        self.main_container = tk.Frame(self, bg=config.COLOR_BG_DARK)
+        self.main_container = tk.Frame(self, bg=self.tm.colors["bg"])
         self.main_container.pack(fill="both", expand=True)
 
-        # Montar W  orkspace a la derecha
+        # Montar Workspace a la derecha
         self.workspace = WorkspaceView(
             self.main_container,
             project_manager=self.pm,
@@ -78,6 +83,13 @@ class ColorPickerApp(tk.Tk):
 
         # Cargar el proyecto activo inicial si existe
         self.workspace.load_active_project()
+        self.project_manager = ProjectManager()
+
+        # ThemeManager se encarga de los colores
+        self.theme_manager = ThemeManager(
+            initial_theme=self.project_manager.theme_name,
+            on_theme_change=self.project_manager.save_theme_preference
+        )
 
     def _set_app_icon(self):
         # Determinar base_dir compatible con desarrollo y con PyInstaller

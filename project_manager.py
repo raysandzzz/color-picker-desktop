@@ -5,6 +5,8 @@ Gestor de persistencia de datos para proyectos y paletas guardadas en JSON.
 import json
 import os
 import uuid
+from typing import Callable, Dict, List
+from config import THEMES
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "projects.json")
 
@@ -15,6 +17,11 @@ class ProjectManager:
         self.projects = self._load_data()
         self.active_project_id = None
 
+        self._listeners: List[Callable[[Dict[str, str]], None]] = []
+        
+        # Cargar datos existentes
+        self.projects, self.theme_name = self._load_data()
+        
         # Si ya existen proyectos previos, seleccionamos el más reciente
         if self.projects:
             self.active_project_id = self.projects[0]["id"]
@@ -24,23 +31,38 @@ class ProjectManager:
         normalized = name.strip().lower()
         return any(p["name"].strip().lower() == normalized for p in self.projects)
     
-    def _load_data(self) -> list[dict]:
-        """Carga la lista de proyectos desde el JSON."""
+    def _load_data(self) -> tuple[list[dict], str]:
+        """Carga la lista de proyectos y el tema configurado desde el JSON."""
         if not os.path.exists(self.filepath):
-            return []
+            return [], "dark"
         try:
             with open(self.filepath, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return []
+                content = json.load(f)
 
-    def _save_data(self):
-        """Escribe los proyectos actuales en el archivo JSON."""
+            # Si ya tiene la estructura con diccionario {"projects": [...], "theme": "..."}
+            if isinstance(content, dict):
+                return content.get("projects", []), content.get("theme", "dark")
+
+            # Compatibilidad: si el JSON viejo era solo una lista [...]
+            if isinstance(content, list):
+                return content, "dark"
+
+        except (json.JSONDecodeError, IOError):
+            return [], "dark"
+
+        return [], "dark"
+
+    def _save_data(self) -> None:
+        """Guarda los proyectos y el tema actual en el JSON."""
+        payload = {
+            "projects": self.projects,
+            "theme": self.theme_name
+        }
         with open(self.filepath, "w", encoding="utf-8") as f:
-            json.dump(self.projects, f, indent=2, ensure_ascii=False)
+            json.dump(payload, f, indent=4)
 
     def create_project(self, name: str, image_path: str) -> dict:
-        """Crea y registra un nuevo proyecto con su imagen asociada."""
+        """Crea y registra una nuevo archivo de paleta con su imagen asociada."""
         project = {
             "id": str(uuid.uuid4())[:8],
             "name": name.strip() or "Untitled Palette",

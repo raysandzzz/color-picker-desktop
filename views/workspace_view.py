@@ -10,7 +10,7 @@ import color_engine
 
 class WorkspaceView(tk.Frame):
     def __init__(self, parent, project_manager, on_palette_updated):
-        super().__init__(parent, bg=config.COLOR_BG_DARK)
+        super().__init__(parent, bg=self.tm.colors["bg"])
         self.pm = project_manager
         self.on_palette_updated = on_palette_updated
 
@@ -23,15 +23,15 @@ class WorkspaceView(tk.Frame):
 
     def _build_ui(self):
         # 1. Barra superior de proyecto
-        self.header_frame = tk.Frame(self, bg=config.COLOR_BG_DARK)
+        self.header_frame = tk.Frame(self, bg=self.tm.colors["bg"])
         self.header_frame.pack(fill="x", padx=20, pady=(16, 10))
 
         self.lbl_title = tk.Label(
             self.header_frame,
             text="Select or create a palette",
             font=config.FONT_TITLE,
-            bg=config.COLOR_BG_DARK,
-            fg=config.COLOR_TEXT_MAIN,
+            bg=self.tm.colors["bg"],
+            fg=self.tm.colors["text_main"],
         )
         self.lbl_title.pack(side="left")
 
@@ -40,23 +40,23 @@ class WorkspaceView(tk.Frame):
             self.header_frame,
             text="",
             font=config.FONT_SUBTITLE,
-            bg=config.COLOR_BG_DARK,
-            fg=config.COLOR_ACCENT_HOVER,
+            bg=self.tm.colors["bg"],
+            fg=self.tm.colors["accent"],
         )
         self.lbl_feedback.pack(side="right", padx=10)
 
         # 2. Contenedor de la Imagen / Canvas
         self.canvas_card = tk.Frame(
             self,
-            bg=config.COLOR_CARD_BG,
-            highlightbackground=config.COLOR_BORDER,
+            bg=self.tm.colors["card_bg"],
+            highlightbackground=self.tm.colors["canvas_border"],
             highlightthickness=1,
         )
         self.canvas_card.pack(fill="both", expand=True, padx=20, pady=(0, 10))
 
         self.canvas = tk.Canvas(
             self.canvas_card,
-            bg=config.COLOR_CARD_BG,
+            bg=self.tm.colors["card_bg"],
             highlightthickness=0,
             cursor="crosshair",
         )
@@ -69,15 +69,15 @@ class WorkspaceView(tk.Frame):
         self.canvas.bind("<Leave>", self._on_mouse_leave)
 
         # 3. Barra de acciones (Herramientas)
-        self.toolbar_frame = tk.Frame(self, bg=config.COLOR_BG_DARK)
+        self.toolbar_frame = tk.Frame(self, bg=self.tm.colors["bg"])
         self.toolbar_frame.pack(fill="x", padx=20, pady=(0, 8))
 
         self.lbl_hint = tk.Label(
             self.toolbar_frame,
             text="• Left click: Copy HEX  |  Right click: Delete  |  Scroll: Wheel",
             font=config.FONT_BADGE,
-            bg=config.COLOR_BG_DARK,
-            fg=config.COLOR_TEXT_MUTED,
+            bg=self.tm.colors["bg"],
+            fg=self.tm.colors["text_2"],
         )
         self.lbl_hint.pack(side="right")
         
@@ -85,8 +85,8 @@ class WorkspaceView(tk.Frame):
             self.toolbar_frame,
             text="✨ Auto Extract Palette",
             font=config.FONT_NORMAL,
-            bg=config.COLOR_BUTTON_SECONDARY,
-            fg=config.COLOR_TEXT_MAIN,
+            bg=self.tm.colors["button_2"],
+            fg=self.tm.colors["text_main"],
             relief="flat",
             cursor="hand2",
             padx=10,
@@ -99,8 +99,8 @@ class WorkspaceView(tk.Frame):
             self.toolbar_frame,
             text="Clear Swatches",
             font=config.FONT_NORMAL,
-            bg=config.COLOR_BG_DARK,
-            fg=config.COLOR_TEXT_MUTED,
+            bg=self.tm.colors["bg"],
+            fg=self.tm.colors["text_2"],
             relief="flat",
             cursor="hand2",
             padx=8,
@@ -116,17 +116,17 @@ class WorkspaceView(tk.Frame):
             variable=self.loupe_enabled,
             command=self._on_toggle_loupe,
             font=config.FONT_BADGE,
-            bg=config.COLOR_BG_DARK,
-            fg=config.COLOR_TEXT_MAIN,
-            activebackground=config.COLOR_BG_DARK,
-            activeforeground=config.COLOR_TEXT_MAIN,
-            selectcolor=config.COLOR_CARD_BG,
+            bg=self.tm.colors["bg"],
+            fg=self.tm.colors["text_main"],
+            activebackground=self.tm.colors["bg"],
+            activeforeground=self.tm.colors["text_main"],
+            selectcolor=self.tm.colors["card_bg"],
             cursor="hand2",
         )
         self.chk_loupe.pack(side="left", padx=(10, 0))
 
         # 4. Contenedor Scrolleable para Swatches
-        self.swatches_outer = tk.Frame(self, bg=config.COLOR_BG_DARK, height=78)
+        self.swatches_outer = tk.Frame(self, bg=self.tm.colors["bg"], height=78)
         self.swatches_outer.pack(fill="x", padx=20, pady=(0, 10))
         self.swatches_outer.pack_propagate(False)
 
@@ -137,7 +137,7 @@ class WorkspaceView(tk.Frame):
 
         self.swatches_canvas = tk.Canvas(
             self.swatches_outer,
-            bg=config.COLOR_BG_DARK,
+            bg=self.tm.colors["bg"],
             highlightthickness=0,
             height=54,
             xscrollcommand=self.swatches_scrollbar.set,
@@ -149,7 +149,7 @@ class WorkspaceView(tk.Frame):
         self.swatches_scrollbar.pack(side="bottom", fill="x")
 
         self.swatches_inner = tk.Frame(
-            self.swatches_canvas, bg=config.COLOR_BG_DARK
+            self.swatches_canvas, bg=self.tm.colors["bg"]
         )
         self.canvas_window_id = self.swatches_canvas.create_window(
             (0, 0), window=self.swatches_inner, anchor="nw"
@@ -202,8 +202,8 @@ class WorkspaceView(tk.Frame):
                 self.swatches_inner,
                 text="Click on any pixel or use 'Auto Extract' to collect main colors.",
                 font=config.FONT_NORMAL,
-                bg=config.COLOR_BG_DARK,
-                fg=config.COLOR_TEXT_MUTED,
+                bg=self.tm.colors["bg"],
+                fg=self.tm.colors["text_2"],
             )
             hint.pack(anchor="w", pady=16)
             return
@@ -255,7 +255,7 @@ class WorkspaceView(tk.Frame):
                 150, 
                 text="Image not found at path.", 
                 font=config.FONT_NORMAL, 
-                fill=config.COLOR_TEXT_MUTED
+                fill=self.tm.colors["text_2"]
             )
             self.current_original_img = None
             self.current_tk_img = None
