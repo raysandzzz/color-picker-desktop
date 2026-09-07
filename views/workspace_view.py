@@ -4,16 +4,18 @@
 from tkinter import ttk
 import os
 import tkinter as tk
-import config
-import color_engine
+import core.config as config
+import core.color_engine as color_engine
 
 
 class WorkspaceView(tk.Frame):
-    def __init__(self, parent, project_manager, on_palette_updated):
-        super().__init__(parent, bg=self.tm.colors["bg"])
+    def __init__(self, parent, project_manager, theme_manager, on_palette_updated):
+        self.tm = theme_manager
         self.pm = project_manager
         self.on_palette_updated = on_palette_updated
 
+        super().__init__(parent, bg=self.tm.colors["bg"])
+        
         self.current_original_img = None
         self.current_tk_img = None
         self.current_scale = 1.0

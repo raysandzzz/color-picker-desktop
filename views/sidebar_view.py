@@ -4,7 +4,7 @@ Vista del sidebar lateral para navegación de proyectos y creación de lienzos.
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import config
+import core.config as config
 
 
 class SidebarView(tk.Frame):

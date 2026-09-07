@@ -6,7 +6,7 @@ import json
 import os
 import uuid
 from typing import Callable, Dict, List
-from config import THEMES
+from core.config import THEMES
 
 DATA_FILE = os.path.join(os.path.dirname(__file__), "projects.json")
 

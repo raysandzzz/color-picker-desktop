@@ -7,11 +7,11 @@ import ctypes
 import os
 import tkinter as tk
 
-import config
-from project_manager import ProjectManager
+import core.config as config
+from core.project_manager import ProjectManager
 from views.sidebar_view import SidebarView
 from views.workspace_view import WorkspaceView
-from theme_manager import ThemeManager
+from core.theme_manager import ThemeManager
 
 def get_asset_path(relative_path):
     """Obtiene la ruta absoluta para desarrollo y para el ejecutable de PyInstaller."""
@@ -46,11 +46,10 @@ class ColorPickerApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.title(config.APP_TITLE)
+        self.title(("Segoe UI", 16, "bold"))
         self.geometry(f"{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}")
         self.minsize(config.MIN_WIDTH, config.MIN_HEIGHT)
         
-
         self._set_app_icon()
         
         # Instancia del gestor de datos
@@ -70,6 +69,7 @@ class ColorPickerApp(tk.Tk):
             self.main_container,
             project_manager=self.pm,
             on_palette_updated=self._on_palette_updated,
+            theme_manager = self.tm
         )
         self.workspace.pack(side="right", fill="both", expand=True)
 
@@ -77,7 +77,7 @@ class ColorPickerApp(tk.Tk):
         self.sidebar = SidebarView(
             self.main_container,
             project_manager=self.pm,
-            on_project_selected=self._on_project_changed,
+            on_project_selected=self._on_project_changed
         )
         self.sidebar.pack(side="left", fill="y")
 

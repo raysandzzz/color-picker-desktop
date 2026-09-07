@@ -1,7 +1,7 @@
 """Theme manager module for dynamic light/dark mode toggling."""
 
 from typing import Callable, Dict, List
-from config import THEMES
+from core.config import THEMES
 
 
 class ThemeManager:
