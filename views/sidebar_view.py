@@ -8,11 +8,13 @@ import core.config as config
 
 
 class SidebarView(tk.Frame):
-    def __init__(self, parent, project_manager, on_project_selected):
-        super().__init__(parent, bg=self.tm.colors["sidebar"], width=220)
-        self.pack_propagate(False)
+    def __init__(self, parent, project_manager, theme_manager, on_project_selected):
+        self.tm = theme_manager
         self.pm = project_manager
         self.on_project_selected = on_project_selected
+        
+        super().__init__(parent, bg=self.tm.colors["sidebar"], width=220)
+        self.pack_propagate(False)
 
         self._build_header()
         self._build_project_list()
@@ -42,13 +44,13 @@ class SidebarView(tk.Frame):
         lbl = tk.Label(
             dialog,
             text="Enter a name for this palette:",
-            font=config.FONT_NORMAL,
+            font=self.tm.fonts["normal"],
             bg=self.tm.colors["bg"],
-            fg=config.COLOR_TEXT_MAIN,
+            fg=self.tm.colors["text_main"],
         )
         lbl.pack(anchor="w", padx=20, pady=(16, 8))
 
-        entry = tk.Entry(dialog, font=config.FONT_NORMAL, relief="solid", bd=1)
+        entry = tk.Entry(dialog, font=self.tm.fonts["normal"], relief="solid", bd=1)
         entry.pack(fill="x", padx=20, ipady=3)
         entry.insert(0, initial_value)
         entry.select_range(0, tk.END)
@@ -67,7 +69,7 @@ class SidebarView(tk.Frame):
         btn_cancel = tk.Button(
             btn_frame,
             text="Cancel",
-            font=config.FONT_NORMAL,
+            font=self.tm.fonts["normal"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["text_2"],
             relief="flat",
@@ -80,8 +82,8 @@ class SidebarView(tk.Frame):
         btn_ok = tk.Button(
             btn_frame,
             text="Confirm",
-            font=config.FONT_SUBTITLE,
-            bg=config.COLOR_ACCENT,
+            font=self.tm.fonts["subtitle"],
+            bg=self.tm.colors["accent"],
             fg="#FFFFFF",
             relief="flat",
             cursor="hand2",
@@ -104,19 +106,19 @@ class SidebarView(tk.Frame):
         title = tk.Label(
             header_frame,
             text="Color Picker",
-            font=config.FONT_TITLE,
+            font=self.tm.fonts["title"],
             bg=self.tm.colors["sidebar"],
-            fg=config.COLOR_TEXT_MAIN,
+            fg=self.tm.colors["text_main"],
         )
         title.pack(anchor="w")
 
         btn_new = tk.Button(
             self,
             text="➕ New Palette",
-            font=config.FONT_SUBTITLE,
-            bg=config.COLOR_ACCENT,
+            font=self.tm.fonts["subtitle"],
+            bg=self.tm.colors["accent"],
             fg="#FFFFFF",
-            activebackground=config.COLOR_ACCENT_HOVER,
+            activebackground=self.tm.colors["accent"],
             activeforeground="#FFFFFF",
             relief="flat",
             cursor="hand2",
@@ -128,7 +130,7 @@ class SidebarView(tk.Frame):
         lbl_section = tk.Label(
             self,
             text="SAVED PALETTES",
-            font=config.FONT_BADGE,
+            font=self.tm.fonts["badge"],
             bg=self.tm.colors["sidebar"],
             fg=self.tm.colors["text_2"],
         )
@@ -213,7 +215,7 @@ class SidebarView(tk.Frame):
             empty_lbl = tk.Label(
                 self.list_container,
                 text="No palettes yet.\nClick '+ New Palette' to start.",
-                font=config.FONT_NORMAL,
+                font=self.tm.fonts["normal"],
                 bg=self.tm.colors["sidebar"],
                 fg=self.tm.colors["text_2"],
                 justify="center",
@@ -223,8 +225,8 @@ class SidebarView(tk.Frame):
 
         for p in projects:
             is_active = p["id"] == active_id
-            bg_color = config.COLOR_CARD_BG if is_active else self.tm.colors["sidebar"]
-            fg_color = config.COLOR_TEXT_MAIN if is_active else self.tm.colors["text_2"]
+            bg_color = self.tm.colors["card_bg"] if is_active else self.tm.colors["sidebar"]
+            fg_color = self.tm.colors["text_main"] if is_active else self.tm.colors["text_2"]
 
             row = tk.Frame(self.list_container, bg=bg_color, cursor="hand2")
             row.pack(fill="x", pady=2, padx=4)
@@ -249,7 +251,7 @@ class SidebarView(tk.Frame):
             name_lbl = tk.Label(
                 row,
                 text=display_name,
-                font=config.FONT_NORMAL,
+                font=self.tm.fonts["normal"],
                 bg=bg_color,
                 fg=fg_color,
                 anchor="w",

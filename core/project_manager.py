@@ -61,6 +61,11 @@ class ProjectManager:
         with open(self.filepath, "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=4)
 
+    def save_theme_preference(self, theme_name: str) -> None:
+        """Actualiza el tema actual y lo persiste en el JSON."""
+        self.theme_name = theme_name
+        self._save_data()
+    
     def create_project(self, name: str, image_path: str) -> dict:
         """Crea y registra una nuevo archivo de paleta con su imagen asociada."""
         project = {

@@ -36,7 +36,6 @@ THEMES = {
         }
 }
 
-
 # Fonts presets
 FONT_PRESETS = {
     "segoe": {

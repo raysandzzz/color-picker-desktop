@@ -46,7 +46,7 @@ class ColorPickerApp(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.title(("Segoe UI", 16, "bold"))
+        self.title(config.APP_TITLE)
         self.geometry(f"{config.WINDOW_WIDTH}x{config.WINDOW_HEIGHT}")
         self.minsize(config.MIN_WIDTH, config.MIN_HEIGHT)
         
@@ -77,6 +77,7 @@ class ColorPickerApp(tk.Tk):
         self.sidebar = SidebarView(
             self.main_container,
             project_manager=self.pm,
+            theme_manager=self.tm,
             on_project_selected=self._on_project_changed
         )
         self.sidebar.pack(side="left", fill="y")
@@ -98,8 +99,8 @@ class ColorPickerApp(tk.Tk):
         except AttributeError:
             base_dir = os.path.dirname(os.path.abspath(__file__))
 
-        ico_path = os.path.join(base_dir, "icon.ico")
-        png_path = os.path.join(base_dir, "icon.png")
+        ico_path = os.path.join(base_dir, "assets/icon.ico")
+        png_path = os.path.join(base_dir, "assets/icon.png")
 
         if os.path.exists(ico_path):
             try:

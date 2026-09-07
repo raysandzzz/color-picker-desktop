@@ -31,7 +31,7 @@ class WorkspaceView(tk.Frame):
         self.lbl_title = tk.Label(
             self.header_frame,
             text="Select or create a palette",
-            font=config.FONT_TITLE,
+            font=self.tm.fonts["title"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["text_main"],
         )
@@ -41,7 +41,7 @@ class WorkspaceView(tk.Frame):
         self.lbl_feedback = tk.Label(
             self.header_frame,
             text="",
-            font=config.FONT_SUBTITLE,
+            font=self.tm.fonts["subtitle"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["accent"],
         )
@@ -77,7 +77,7 @@ class WorkspaceView(tk.Frame):
         self.lbl_hint = tk.Label(
             self.toolbar_frame,
             text="• Left click: Copy HEX  |  Right click: Delete  |  Scroll: Wheel",
-            font=config.FONT_BADGE,
+            font=self.tm.fonts["badge"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["text_2"],
         )
@@ -86,7 +86,7 @@ class WorkspaceView(tk.Frame):
         self.btn_auto = tk.Button(
             self.toolbar_frame,
             text="✨ Auto Extract Palette",
-            font=config.FONT_NORMAL,
+            font=self.tm.fonts["normal"],
             bg=self.tm.colors["button_2"],
             fg=self.tm.colors["text_main"],
             relief="flat",
@@ -100,7 +100,7 @@ class WorkspaceView(tk.Frame):
         self.btn_clear = tk.Button(
             self.toolbar_frame,
             text="Clear Swatches",
-            font=config.FONT_NORMAL,
+            font=self.tm.fonts["normal"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["text_2"],
             relief="flat",
@@ -117,7 +117,7 @@ class WorkspaceView(tk.Frame):
             text="🔍 Inspector",
             variable=self.loupe_enabled,
             command=self._on_toggle_loupe,
-            font=config.FONT_BADGE,
+            font=self.tm.fonts["badge"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["text_main"],
             activebackground=self.tm.colors["bg"],
@@ -203,7 +203,7 @@ class WorkspaceView(tk.Frame):
             hint = tk.Label(
                 self.swatches_inner,
                 text="Click on any pixel or use 'Auto Extract' to collect main colors.",
-                font=config.FONT_NORMAL,
+                font=self.tm.fonts["normal"],
                 bg=self.tm.colors["bg"],
                 fg=self.tm.colors["text_2"],
             )
@@ -218,7 +218,7 @@ class WorkspaceView(tk.Frame):
                 height=42,
                 relief="flat",
                 cursor="hand2",
-                highlightbackground=config.COLOR_BORDER,
+                highlightbackground=self.tm.colors["canvas_border"],
                 highlightthickness=1,
             )
             box.pack(side="left", padx=4, pady=8)
@@ -256,7 +256,7 @@ class WorkspaceView(tk.Frame):
                 200, 
                 150, 
                 text="Image not found at path.", 
-                font=config.FONT_NORMAL, 
+                font=self.tm.fonts["normal"], 
                 fill=self.tm.colors["text_2"]
             )
             self.current_original_img = None
