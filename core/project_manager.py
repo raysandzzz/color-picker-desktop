@@ -5,10 +5,17 @@ Data persistence manager for projects and palettes saved in JSON.
 import json
 import os
 import uuid
+import sys
 from typing import Callable, Dict, List
-from core.config import THEMES
 
-DATA_FILE = os.path.join(os.path.dirname(__file__), "projects.json")
+# If it runs compiled, take the ColorPicker.exe folder
+# If it runs in development, go up one level from core/to the root of the project
+if getattr(sys, "frozen", False):
+    ROOT_DIR = os.path.dirname(sys.executable)
+else:
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+DATA_FILE = os.path.join(ROOT_DIR, "save.json")
 
 
 class ProjectManager:

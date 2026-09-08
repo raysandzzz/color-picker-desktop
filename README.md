@@ -17,7 +17,7 @@ A modular desktop application built with Python and Tkinter designed for precise
 
 - **Pixel-Level Precision:** Interactive canvas with responsive scaling and image rendering via Pillow.
 - **Magnifying Loupe:** Real-time magnified inspection window displaying exact HEX and RGB color values.
-- **Palette & Project Management:** Organize, save, and persist custom palettes locally via `projects.json`.
+- **Palette & Project Management:** Organize, save, and persist custom palettes locally via `save.json`.
 - **Decoupled Architecture:** Clean separation of concerns between UI components (`workspace_view`, `sidebar_view`), business logic (`color_engine`), and storage (`project_manager`).
 - **Native Windows Integration:** Dedicated taskbar grouping via `AppUserModelID` and standalone executable support.
 
@@ -114,5 +114,5 @@ The output will be generated inside the `dist/ColorPicker/` directory.
 
 * **GUI Framework:** Python 3 / Tkinter
 * **Image Processing:** [Pillow (PIL)](https://python-pillow.org/)
-* **Data Storage:** JSON (`projects.json`)
+* **Data Storage:** JSON (`save.json`)
 * **Packaging:** [PyInstaller](https://pyinstaller.org/)

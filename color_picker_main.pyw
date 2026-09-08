@@ -14,7 +14,12 @@ from views.sidebar_view import SidebarView
 from views.workspace_view import WorkspaceView
 from core.theme_manager import ThemeManager
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, "frozen", False):
+    # In the .exe: point to the folder where ColorPicker.exe and the assets folder are
+    BASE_DIR = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+else:
+    # In normal development (.py):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def load_custom_font(relative_path: str):
     font_path = os.path.join(BASE_DIR, relative_path)
@@ -22,13 +27,17 @@ def load_custom_font(relative_path: str):
         # 0x10 = FR_PRIVATE (only available to your process while it is open)
         ctypes.windll.gdi32.AddFontResourceExW(font_path, 0x10, 0)
 
-def get_asset_path(relative_path):
-    """Gets the absolute path for development and for the PyInstaller executable."""
-    try:
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path) 
+def get_asset_path(relative_path: str) -> str:
+    """Gets the absolute path for development and for PyInstaller (onedir and onefile)."""
+    if getattr(sys, "frozen", False):
+        # If it runs compiled (.exe)
+        # In --onefile use _MEIPASS, in --onedir use the executable directory
+        base_path = getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))
+    else:
+        # If it run in development mode (.py /.pyw)
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.join(base_path, relative_path)
 
 load_custom_font(get_asset_path("assets/fonts/determination.ttf"))
 load_custom_font(get_asset_path("assets/fonts/Panton-Trial-Bold.ttf"))

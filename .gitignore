@@ -14,8 +14,8 @@ build/
 dist/
 *.spec
 
-# User / Local data persistence (opcional si no quieres subir tu projects.json local)
-projects.json
+# User /Local data persistence (optional if you don't want to upload your local save.json)
+save.json
 
 # Operating System files
 Thumbs.db
