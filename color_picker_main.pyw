@@ -6,6 +6,7 @@ import sys
 import ctypes
 import os
 import tkinter as tk
+from tkinterdnd2 import TkinterDnD
 
 import core.config as config
 from core.project_manager import ProjectManager
@@ -42,7 +43,7 @@ except Exception:
     pass
 
 
-class ColorPickerApp(tk.Tk):
+class ColorPickerApp(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
 
@@ -96,6 +97,7 @@ class ColorPickerApp(tk.Tk):
             on_project_selected=self._on_project_changed,
             on_theme_toggle=self._handle_theme_toggle,
             on_font_toggle=self._handle_font_toggle,
+            on_project_activated=lambda: self.workspace.load_active_project()
         )
         self.sidebar.pack(side="left", fill="y")
 
@@ -104,6 +106,7 @@ class ColorPickerApp(tk.Tk):
             project_manager=self.pm,
             theme_manager=self.tm,
             on_palette_updated=self.sidebar.refresh_list,
+            on_file_dropped=self.sidebar._on_new_palette_clicked
         )
         self.workspace.pack(side="right", fill="both", expand=True)
 
@@ -148,7 +151,7 @@ class ColorPickerApp(tk.Tk):
         self.pm.save_font_preference(self.tm.current_font_name)
         # 2. Reconstruir UI:
         self._build_ui()
-
+        
 if __name__ == "__main__":
     app = ColorPickerApp()
     app.mainloop()

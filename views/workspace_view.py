@@ -4,12 +4,12 @@
 from tkinter import ttk
 import os
 import tkinter as tk
+from tkinterdnd2 import DND_FILES
 import core.config as config
 import core.color_engine as color_engine
 
-
 class WorkspaceView(tk.Frame):
-    def __init__(self, parent, project_manager, theme_manager, on_palette_updated):
+    def __init__(self, parent, project_manager, theme_manager, on_palette_updated, on_file_dropped=None):
         self.tm = theme_manager
         self.pm = project_manager
         self.on_palette_updated = on_palette_updated
@@ -20,8 +20,10 @@ class WorkspaceView(tk.Frame):
         self.current_tk_img = None
         self.current_scale = 1.0
         self.loupe_enabled = tk.BooleanVar(value=True)
+        self.on_file_dropped = on_file_dropped
 
         self._build_ui()
+        self._setup_dnd()
 
     def _build_ui(self):
         # 1. Barra superior de proyecto
@@ -444,3 +446,17 @@ class WorkspaceView(tk.Frame):
     def _on_mouse_leave(self, event=None):
         """Oculta la lupa cuando el ratón sale del área del canvas."""
         self.canvas.delete("loupe")
+    
+    def _setup_dnd(self):
+        # Registrar este frame para aceptar exclusivamente archivos
+        self.drop_target_register(DND_FILES)
+        self.dnd_bind("<<Drop>>", self._on_file_drop)
+
+    def _on_file_drop(self, event):
+        filepath = event.data.strip()
+        if filepath.startswith("{") and filepath.endswith("}"):
+            filepath = filepath[1:-1]
+
+        # Llama al callback recibido en el __init__, NO a esta misma función:
+        if self.on_file_dropped:
+            self.on_file_dropped(filepath)

@@ -4,7 +4,6 @@ Vista del sidebar lateral para navegación de proyectos y creación de lienzos.
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import core.config as config
 
 
 class SidebarView(tk.Frame):
@@ -14,13 +13,15 @@ class SidebarView(tk.Frame):
                 theme_manager, 
                 on_project_selected, 
                 on_theme_toggle=None, 
-                on_font_toggle=None
+                on_font_toggle=None,
+                on_project_activated=None
                 ):
         self.tm = theme_manager
         self.pm = project_manager
         self.on_project_selected = on_project_selected
         self.on_theme_toggle = on_theme_toggle
         self.on_font_toggle = on_font_toggle
+        self.on_project_activated = on_project_activated
         
         super().__init__(parent, bg=self.tm.colors["sidebar"], width=220)
         self.pack_propagate(False)
@@ -330,13 +331,24 @@ class SidebarView(tk.Frame):
         self.refresh_list()
         self.on_project_selected()
 
-    def _on_new_palette_clicked(self):
-        file_types = [("Image files", "*.png;*.jpg;*.jpeg;*.bmp;*.webp")]
-        file_path = filedialog.askopenfilename(title="Select an Image", filetypes=file_types)
+    def _on_new_palette_clicked(self, filepath=None):
+        # 1. Si no viene del Drag & Drop, abrir el explorador de archivos
+        if not filepath:
+            file_types = [
+                (
+                    "Image files",
+                    "*.png *.jpg *.jpeg *.bmp *.webp *.gif *.tiff",
+                )
+            ]
+            filepath = filedialog.askopenfilename(
+                title="Select an Image", filetypes=file_types
+            )
 
-        if not file_path:
+        # 2. Si canceló el diálogo o no hay ruta, salir
+        if not filepath:
             return
 
+        # 3. Solicitar y validar nombre de la paleta
         name = "New Palette"
         while True:
             name = self._prompt_palette_name(name)
@@ -345,20 +357,30 @@ class SidebarView(tk.Frame):
 
             clean_name = name.strip()
             if not clean_name:
-                messagebox.showwarning("Invalid Name", "Palette name cannot be empty.")
+                messagebox.showwarning(
+                    "Invalid Name", "Palette name cannot be empty."
+                )
                 name = "New Palette"
                 continue
 
             if self.pm.project_name_exists(clean_name):
                 messagebox.showwarning(
                     "Name In Use",
-                    f"A palette named '{clean_name}' already exists. Please choose a different name."
+                    f"A palette named '{clean_name}' already exists. Please choose a different name.",
                 )
                 continue
 
             # Nombre válido y no duplicado
             break
 
-        project = self.pm.create_project(name, file_path)
+        # 4. Crear el proyecto
+        new_project = self.pm.create_project(name=clean_name, image_path=filepath)
+
+        # 5. NUEVO: Seleccionarlo como el proyecto activo actual
+        if hasattr(self.pm, "set_active_project"):
+            self.pm.set_active_project(new_project.get("id", clean_name))  # o por nombre/objeto según cómo lo maneje tu PM
+        # 6. Refrescar la UI
         self.refresh_list()
-        self.on_project_selected()
+        
+        if self.on_project_activated:
+            self.on_project_activated()
