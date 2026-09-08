@@ -5,7 +5,6 @@ from tkinter import ttk
 import os
 import tkinter as tk
 from tkinterdnd2 import DND_FILES
-import core.config as config
 import core.color_engine as color_engine
 
 class WorkspaceView(tk.Frame):

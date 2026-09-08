@@ -22,18 +22,17 @@ def load_custom_font(relative_path: str):
         # 0x10 = FR_PRIVATE (solo disponible para tu proceso mientras esté abierto)
         ctypes.windll.gdi32.AddFontResourceExW(font_path, 0x10, 0)
 
-load_custom_font("assets/fonts/determination.ttf")
-load_custom_font("assets/fonts/Panton-Trial-Bold.ttf")
-load_custom_font("assets/fonts/Panton-Trial-Regular.ttf")
-
 def get_asset_path(relative_path):
     """Obtiene la ruta absoluta para desarrollo y para el ejecutable de PyInstaller."""
     try:
         base_path = sys._MEIPASS
     except AttributeError:
         base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+    return os.path.join(base_path, relative_path) 
 
+load_custom_font(get_asset_path("assets/fonts/determination.ttf"))
+load_custom_font(get_asset_path("assets/fonts/Panton-Trial-Bold.ttf"))
+load_custom_font(get_asset_path("assets/fonts/Panton-Trial-Regular.ttf"))
 
 # Activar DPI awareness en Windows
 if sys.platform == "win32":
@@ -49,7 +48,7 @@ if sys.platform == "win32":
 
 # Configurar AppUserModelID para que Windows muestre el icono en la barra de tareas
 try:
-    myappid = "pythonprojects.gui.pastelcolorpicker.1.0"
+    myappid = "pythonprojects.gui.colorpicker.2.0"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 except Exception:
     pass
