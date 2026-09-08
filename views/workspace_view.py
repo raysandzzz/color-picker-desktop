@@ -2,6 +2,7 @@
 Work area: image rendering with adaptive zoom, eyedropper and color grid.
 """
 from tkinter import ttk
+from tkinter import dialog
 import os
 import tkinter as tk
 from tkinterdnd2 import DND_FILES
@@ -451,11 +452,18 @@ class WorkspaceView(tk.Frame):
         self.drop_target_register(DND_FILES)
         self.dnd_bind("<<Drop>>", self._on_file_drop)
 
+    def _on_dialog_close(self):
+        self._is_dialog_open = False
+        dialog.destroy()
+    
     def _on_file_drop(self, event):
+        if getattr(self, "_is_dialog_open", False):
+            return
+
         filepath = event.data.strip()
         if filepath.startswith("{") and filepath.endswith("}"):
             filepath = filepath[1:-1]
 
-        # Call the callback received in the __init__, NOT this same function:
         if self.on_file_dropped:
-            self.on_file_dropped(filepath)
+            self._is_dialog_open = True
+            self.after(20, lambda path=filepath: self.on_file_dropped(path))
