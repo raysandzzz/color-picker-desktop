@@ -13,16 +13,16 @@ MIN_HEIGHT = 550
 # Temas (claro/oscuro)
 THEMES = {
     "dark": {
-        "bg": "#E9EFE9",             # Fondo suave
-        "sidebar": "#D8E2DC",        # Fondo sidebar
-        "card_bg": "#FFFFFF",        # Fondo tarjetas y contenedores blancos
-        "accent" : "#99BC85",        # Acento para algun boton especifico
-        "button" : "#88AA74",        # Color botones primarios
-        "button_2": "#C7D3C8",       # Color botones secundarios
-        "canvas_border": "#B8C5B9",  # Color borde del canvas
-        "text_main": "#2D3732",      # Texto principal
-        "text_2" : "#6B7C72"         # Textos secundarios
-        },
+        "bg": "#1e1e1e",             # Fondo principal oscuro clásico VS Code
+        "sidebar": "#252526",        # Sidebar ligeramente diferenciada
+        "card_bg": "#2d2d2d",        # Superficies y contenedores elevados
+        "accent": "#4ec9b0",         # Acento estilo teal/menta característico
+        "button": "#2e5c46",         # Botón primario verde apagado cómodo
+        "button_2": "#3a3d41",       # Botón secundario neutro
+        "canvas_border": "#5af78e", # Borde neón suave (menta con transparencia sutil)
+        "text_main": "#d4d4d4",      # Texto principal estándar legible
+        "text_2": "#858585"          # Texto secundario / muted
+    },
     "light": {
         "bg": "#E9EFE9",             # Fondo suave
         "sidebar": "#D8E2DC",        # Fondo sidebar

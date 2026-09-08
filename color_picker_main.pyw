@@ -64,33 +64,48 @@ class ColorPickerApp(tk.Tk):
         self.main_container = tk.Frame(self, bg=self.tm.colors["bg"])
         self.main_container.pack(fill="both", expand=True)
 
-        # Montar Workspace a la derecha
-        self.workspace = WorkspaceView(
-            self.main_container,
-            project_manager=self.pm,
-            on_palette_updated=self._on_palette_updated,
-            theme_manager = self.tm
-        )
-        self.workspace.pack(side="right", fill="both", expand=True)
+        # Cargar el proyecto activo inicial si existe
 
-        # Montar Sidebar a la izquierda
+        self.project_manager = ProjectManager()
+
+        # ThemeManager se encarga de los colores
+        self.tm = ThemeManager(
+            initial_theme=self.project_manager.theme_name,
+            on_theme_change=self.project_manager.save_theme_preference,
+            initial_font= self.project_manager.font_name
+        )
+    
+        self._build_ui()
+        
+    def _build_ui(self):
+        # 1. Si ya existe un contenedor previo (por un toggle), destrúyelo
+        if self.main_container is not None:
+            self.main_container.destroy()
+
+        self.configure(bg=self.tm.colors["bg"])
+
+        # 2. Crea un contenedor NUEVO colgado directamente de la ventana (self)
+        self.main_container = tk.Frame(self, bg=self.tm.colors["bg"])
+        self.main_container.pack(fill="both", expand=True)
+
+        # 3. Empaca la sidebar y workspace dentro de este nuevo main_container
         self.sidebar = SidebarView(
             self.main_container,
             project_manager=self.pm,
             theme_manager=self.tm,
-            on_project_selected=self._on_project_changed
+            on_project_selected=self._on_project_changed,
+            on_theme_toggle=self._handle_theme_toggle,
+            on_font_toggle=self._handle_font_toggle,
         )
         self.sidebar.pack(side="left", fill="y")
 
-        # Cargar el proyecto activo inicial si existe
-        self.workspace.load_active_project()
-        self.project_manager = ProjectManager()
-
-        # ThemeManager se encarga de los colores
-        self.theme_manager = ThemeManager(
-            initial_theme=self.project_manager.theme_name,
-            on_theme_change=self.project_manager.save_theme_preference
+        self.workspace = WorkspaceView(
+            self.main_container,
+            project_manager=self.pm,
+            theme_manager=self.tm,
+            on_palette_updated=self.sidebar.refresh_list,
         )
+        self.workspace.pack(side="right", fill="both", expand=True)
 
     def _set_app_icon(self):
         # Determinar base_dir compatible con desarrollo y con PyInstaller
@@ -119,7 +134,20 @@ class ColorPickerApp(tk.Tk):
 
     def _on_palette_updated(self):
         pass
+    
+    def _handle_theme_toggle(self):
+        self.tm.toggle_theme()
+        # 1. Avisarle al ProjectManager y guardar en el JSON de inmediato:
+        self.pm.save_theme_preference(self.tm.current_theme_name)
+        # 2. Reconstruir UI:
+        self._build_ui()
 
+    def _handle_font_toggle(self):
+        self.tm.toggle_font()
+        # 1. Avisarle al ProjectManager y guardar en el JSON de inmediato:
+        self.pm.save_font_preference(self.tm.current_font_name)
+        # 2. Reconstruir UI:
+        self._build_ui()
 
 if __name__ == "__main__":
     app = ColorPickerApp()

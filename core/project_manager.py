@@ -14,13 +14,12 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "projects.json")
 class ProjectManager:
     def __init__(self, filepath: str = DATA_FILE):
         self.filepath = filepath
-        self.projects = self._load_data()
         self.active_project_id = None
 
         self._listeners: List[Callable[[Dict[str, str]], None]] = []
         
         # Cargar datos existentes
-        self.projects, self.theme_name = self._load_data()
+        self.projects, self.theme_name, self.font_name = self._load_data()
         
         # Si ya existen proyectos previos, seleccionamos el más reciente
         if self.projects:
@@ -31,39 +30,47 @@ class ProjectManager:
         normalized = name.strip().lower()
         return any(p["name"].strip().lower() == normalized for p in self.projects)
     
-    def _load_data(self) -> tuple[list[dict], str]:
-        """Carga la lista de proyectos y el tema configurado desde el JSON."""
+    def _load_data(self) -> tuple[list[dict], str, str]:
+        """Carga la lista de proyectos, el tema y la fuente configurados desde el JSON."""
         if not os.path.exists(self.filepath):
-            return [], "dark"
+            return [], "light", "segoe"
         try:
             with open(self.filepath, "r", encoding="utf-8") as f:
                 content = json.load(f)
 
-            # Si ya tiene la estructura con diccionario {"projects": [...], "theme": "..."}
             if isinstance(content, dict):
-                return content.get("projects", []), content.get("theme", "dark")
+                return (
+                    content.get("projects", []),
+                    content.get("theme", "dark"),
+                    content.get("font", "segoe"),
+                )
 
-            # Compatibilidad: si el JSON viejo era solo una lista [...]
+            # Compatibilidad
             if isinstance(content, list):
-                return content, "dark"
+                return content, "dark", "segoe"
 
         except (json.JSONDecodeError, IOError):
-            return [], "dark"
+            return [], "dark", "segoe"
 
-        return [], "dark"
+        return [], "dark", "segoe"
 
     def _save_data(self) -> None:
         """Guarda los proyectos y el tema actual en el JSON."""
-        payload = {
+        data = {
             "projects": self.projects,
-            "theme": self.theme_name
+            "theme": self.theme_name,
+            "font": self.font_name
         }
         with open(self.filepath, "w", encoding="utf-8") as f:
-            json.dump(payload, f, indent=4)
+            json.dump(data, f, indent=4)
 
     def save_theme_preference(self, theme_name: str) -> None:
         """Actualiza el tema actual y lo persiste en el JSON."""
         self.theme_name = theme_name
+        self._save_data()
+    
+    def save_font_preference(self, font_name: str) -> None:
+        self.font_name = font_name
         self._save_data()
     
     def create_project(self, name: str, image_path: str) -> dict:

@@ -8,10 +8,19 @@ import core.config as config
 
 
 class SidebarView(tk.Frame):
-    def __init__(self, parent, project_manager, theme_manager, on_project_selected):
+    def __init__(self, 
+                parent, 
+                project_manager, 
+                theme_manager, 
+                on_project_selected, 
+                on_theme_toggle=None, 
+                on_font_toggle=None
+                ):
         self.tm = theme_manager
         self.pm = project_manager
         self.on_project_selected = on_project_selected
+        self.on_theme_toggle = on_theme_toggle
+        self.on_font_toggle = on_font_toggle
         
         super().__init__(parent, bg=self.tm.colors["sidebar"], width=220)
         self.pack_propagate(False)
@@ -137,6 +146,48 @@ class SidebarView(tk.Frame):
         lbl_section.pack(anchor="w", padx=14, pady=(4, 6))
 
     def _build_project_list(self):
+        footer_frame = tk.Frame(self, bg=self.tm.colors["sidebar"])
+        footer_frame.pack(side="bottom", fill="x", padx=12, pady=12)
+        
+        font_txt = "Aa Pixel" if self.tm.current_font_name == "segoe" else "Aa Clean"
+        self.btn_font = tk.Button(
+            footer_frame,
+            text=font_txt,
+            font=self.tm.fonts["badge"],
+            bg=self.tm.colors["button_2"],
+            fg=self.tm.colors["text_main"],
+            activebackground=self.tm.colors["button_2"],
+            activeforeground=self.tm.colors["text_main"],
+            relief="flat",
+            bd=0,
+            padx=10,
+            pady=6,
+            cursor="hand2",
+            command=self.on_font_toggle,
+        )
+        self.btn_font.pack(side="left", fill="x", expand=True, padx=(0, 4))
+
+        # Botón Theme Toggle (Dark / Light)
+        theme_txt = (
+            "☀️ Light" if self.tm.current_theme_name == "dark" else "🌙 Dark"
+        )
+        self.btn_theme = tk.Button(
+            footer_frame,
+            text=theme_txt,
+            font=self.tm.fonts["badge"],
+            bg=self.tm.colors["button_2"],
+            fg=self.tm.colors["text_main"],
+            activebackground=self.tm.colors["button_2"],
+            activeforeground=self.tm.colors["text_main"],
+            relief="flat",
+            bd=0,
+            padx=10,
+            pady=6,
+            cursor="hand2",
+            command=self.on_theme_toggle,
+        )
+        self.btn_theme.pack(side="right", fill="x", expand=True, padx=(4, 0))
+        
         # 1. Marco exterior
         self.scroll_container = tk.Frame(self, bg=self.tm.colors["sidebar"])
         self.scroll_container.pack(fill="both", expand=True, padx=8, pady=(0, 10))
@@ -266,8 +317,7 @@ class SidebarView(tk.Frame):
             # Propagar scroll de la rueda del ratón
             row.bind("<MouseWheel>", self._on_mousewheel)
             name_lbl.bind("<MouseWheel>", self._on_mousewheel)
-            btn_del.bind("<MouseWheel>", self._on_mousewheel)
-            
+            btn_del.bind("<MouseWheel>", self._on_mousewheel)          
             
     def _on_delete_project_clicked(self, project_id: str, name: str):
         if messagebox.askyesno("Delete Canvas", f"Are you sure you want to delete '{name}'?"):
