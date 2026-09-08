@@ -116,10 +116,10 @@ class WorkspaceView(tk.Frame):
         # Button para activar o desactivar la lupa
         self.chk_loupe = tk.Checkbutton(
             self.toolbar_frame,
-            text="🔍 Inspector",
+            text="⌕ Loupe",
             variable=self.loupe_enabled,
             command=self._on_toggle_loupe,
-            font=self.tm.fonts["badge"],
+            font=self.tm.fonts["inspector"],
             bg=self.tm.colors["bg"],
             fg=self.tm.colors["text_main"],
             activebackground=self.tm.colors["bg"],
@@ -127,7 +127,7 @@ class WorkspaceView(tk.Frame):
             selectcolor=self.tm.colors["card_bg"],
             cursor="hand2",
         )
-        self.chk_loupe.pack(side="left", padx=(10, 0))
+        self.chk_loupe.pack(side="left", padx=(0,0))
 
         # 4. Contenedor Scrolleable para Swatches
         self.swatches_outer = tk.Frame(self, bg=self.tm.colors["bg"], height=78)
@@ -432,7 +432,7 @@ class WorkspaceView(tk.Frame):
                 lx + 46, ly,
                 text=hex_color.upper(),
                 fill="#EDEDED",
-                font=("Segoe UI", 8, "bold"),
+                font=("panton UI", 8, "bold"),
                 tags="loupe"
             )
         else:

@@ -38,19 +38,21 @@ THEMES = {
 
 # Fonts presets
 FONT_PRESETS = {
-    "segoe": {
-        "title": ("Segoe UI", 15, "bold"),
-        "subtitle": ("Segoe UI", 10, "bold"),
-        "normal": ("Segoe UI", 9),
+    "panton": {
+        "title": ("Panton-Trial", 15, "bold"),
+        "subtitle": ("Panton-Trial", 10, "bold"),
+        "normal": ("Panton-Trial", 9),
         "code": ("Consolas", 9, "bold"),
-        "badge": ("Segoe UI", 8),
+        "badge": ("Panton-Trial", 9),
+        "inspector": ("Panton-Trial", 9)
     },
     "pixel": {
-        "title": ("Minecraft", 15, "bold"),
-        "subtitle": ("Minecraft", 10, "bold"),
-        "normal": ("Minecraft", 9),
+        "title": ("Determination", 15, "bold"),
+        "subtitle": ("Determination", 10, "bold"),
+        "normal": ("Determination", 9),
         "code": ("Consolas", 9, "bold"),
-        "badge": ("Minecraft", 8)
+        "badge": ("Determination", 8),
+        "inspector": ("Determination", 9)
     }
 }
 

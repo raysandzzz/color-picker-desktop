@@ -150,7 +150,7 @@ class SidebarView(tk.Frame):
         footer_frame = tk.Frame(self, bg=self.tm.colors["sidebar"])
         footer_frame.pack(side="bottom", fill="x", padx=12, pady=12)
         
-        font_txt = "Aa Pixel" if self.tm.current_font_name == "segoe" else "Aa Clean"
+        font_txt = "Aa Pixel" if self.tm.current_font_name == "panton" else "Aa Clean"
         self.btn_font = tk.Button(
             footer_frame,
             text=font_txt,
@@ -287,7 +287,7 @@ class SidebarView(tk.Frame):
             btn_del = tk.Label(
                 row,
                 text="✕",
-                font=("Segoe UI", 9),
+                font=("panton UI", 9),
                 bg=bg_color,
                 fg=self.tm.colors["text_2"],
                 cursor="hand2",

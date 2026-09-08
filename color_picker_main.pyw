@@ -14,6 +14,18 @@ from views.sidebar_view import SidebarView
 from views.workspace_view import WorkspaceView
 from core.theme_manager import ThemeManager
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+def load_custom_font(relative_path: str):
+    font_path = os.path.join(BASE_DIR, relative_path)
+    if os.path.exists(font_path):
+        # 0x10 = FR_PRIVATE (solo disponible para tu proceso mientras esté abierto)
+        ctypes.windll.gdi32.AddFontResourceExW(font_path, 0x10, 0)
+
+load_custom_font("assets/fonts/determination.ttf")
+load_custom_font("assets/fonts/Panton-Trial-Bold.ttf")
+load_custom_font("assets/fonts/Panton-Trial-Regular.ttf")
+
 def get_asset_path(relative_path):
     """Obtiene la ruta absoluta para desarrollo y para el ejecutable de PyInstaller."""
     try:

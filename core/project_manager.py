@@ -33,7 +33,7 @@ class ProjectManager:
     def _load_data(self) -> tuple[list[dict], str, str]:
         """Carga la lista de proyectos, el tema y la fuente configurados desde el JSON."""
         if not os.path.exists(self.filepath):
-            return [], "light", "segoe"
+            return [], "light", "panton"
         try:
             with open(self.filepath, "r", encoding="utf-8") as f:
                 content = json.load(f)
@@ -42,17 +42,17 @@ class ProjectManager:
                 return (
                     content.get("projects", []),
                     content.get("theme", "dark"),
-                    content.get("font", "segoe"),
+                    content.get("font", "panton"),
                 )
 
             # Compatibilidad
             if isinstance(content, list):
-                return content, "dark", "segoe"
+                return content, "dark", "panton"
 
         except (json.JSONDecodeError, IOError):
-            return [], "dark", "segoe"
+            return [], "dark", "panton"
 
-        return [], "dark", "segoe"
+        return [], "dark", "panton"
 
     def _save_data(self) -> None:
         """Guarda los proyectos y el tema actual en el JSON."""

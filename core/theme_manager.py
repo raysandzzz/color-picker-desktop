@@ -9,14 +9,14 @@ class ThemeManager:
     
     def __init__(self, 
                 initial_theme: str = "light", 
-                initial_font: str = "segoe",
+                initial_font: str = "panton",
                 on_theme_change: Optional[Callable[[str], None]] = None
                 ):
         
         self.current_theme_name: str = initial_theme if initial_theme in THEMES else "light"
         self.current_font_name = initial_font
         self.current_font_name = (
-            initial_font if initial_font in FONT_PRESETS else "segoe"
+            initial_font if initial_font in FONT_PRESETS else "panton"
         )
         self.on_theme_change = on_theme_change
         self._listeners: List[Callable[[Dict[str, str]], None]] = []
@@ -58,9 +58,9 @@ class ThemeManager:
     @property
     def fonts(self):
         """Retorna el set de fuentes activo ('title', 'normal', etc.)."""
-        return FONT_PRESETS.get(self.current_font_name, FONT_PRESETS["segoe"])
+        return FONT_PRESETS.get(self.current_font_name, FONT_PRESETS["panton"])
 
     def toggle_font(self):
         """Alterna entre la tipografía estándar y la pixel/retro."""
-        self.current_font_name = "pixel" if self.current_font_name == "segoe" else "segoe"
+        self.current_font_name = "pixel" if self.current_font_name == "panton" else "panton"
         return self.fonts
