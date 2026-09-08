@@ -1,5 +1,5 @@
 """
-Vista del sidebar lateral para navegación de proyectos y creación de lienzos.
+Sidebar view for project navigation and canvas creation.
 """
 
 import tkinter as tk
@@ -31,7 +31,7 @@ class SidebarView(tk.Frame):
         self.refresh_list()
 
     def _prompt_palette_name(self, initial_value: str = "New Palette") -> str | None:
-        """Modal con dimensiones fijas y estilo consistente para ingresar el nombre."""
+        """Modal with fixed dimensions and consistent style for entering the name."""
         dialog = tk.Toplevel(self)
         dialog.title("Palette Name")
         dialog.geometry("360x150")
@@ -40,7 +40,7 @@ class SidebarView(tk.Frame):
         dialog.transient(self.winfo_toplevel())
         dialog.grab_set()
 
-        # Centrar relativo a la ventana principal
+        # Center relative to main window
         root_x = self.winfo_toplevel().winfo_x()
         root_y = self.winfo_toplevel().winfo_y()
         root_w = self.winfo_toplevel().winfo_width()
@@ -168,7 +168,7 @@ class SidebarView(tk.Frame):
         )
         self.btn_font.pack(side="left", fill="x", expand=True, padx=(0, 4))
 
-        # Botón Theme Toggle (Dark / Light)
+        # Theme Toggle Button (Dark/Light)
         theme_txt = (
             "☀️ Light" if self.tm.current_theme_name == "dark" else "🌙 Dark"
         )
@@ -189,16 +189,16 @@ class SidebarView(tk.Frame):
         )
         self.btn_theme.pack(side="right", fill="x", expand=True, padx=(4, 0))
         
-        # 1. Marco exterior
+        # 1. Outer frame
         self.scroll_container = tk.Frame(self, bg=self.tm.colors["sidebar"])
         self.scroll_container.pack(fill="both", expand=True, padx=8, pady=(0, 10))
 
-        # 2. Scrollbar vertical
+        # 2. Vertical Scrollbar
         self.sidebar_scrollbar = tk.Scrollbar(
             self.scroll_container, orient="vertical"
         )
 
-        # 3. Canvas intermedio para permitir el desplazamiento
+        # 3. Intermediate Canvas to allow scrolling
         self.list_canvas = tk.Canvas(
             self.scroll_container,
             bg=self.tm.colors["sidebar"],
@@ -209,13 +209,13 @@ class SidebarView(tk.Frame):
 
         self.list_canvas.pack(side="left", fill="both", expand=True)
 
-        # 4. El contenedor real donde se añaden los proyectos (mismo nombre para compatibilidad)
+        # 4. The actual container where the projects are added (same name for compatibility)
         self.list_container = tk.Frame(self.list_canvas, bg=self.tm.colors["sidebar"])
         self.list_window_id = self.list_canvas.create_window(
             (0, 0), window=self.list_container, anchor="nw"
         )
 
-        # 5. Eventos para ajustar dimensiones y el scroll con la rueda
+        # 5. Events to adjust dimensions and scroll with the wheel
         self.list_container.bind("<Configure>", self._on_list_configure)
         self.list_canvas.bind("<Configure>", self._on_canvas_configure)
 
@@ -227,7 +227,7 @@ class SidebarView(tk.Frame):
         self.list_canvas.itemconfig(self.list_window_id, width=event.width)
 
     def _on_list_configure(self, event=None):
-        """Muestra u oculta la barra de desplazamiento según el desbordamiento."""
+        """Show or hide the scroll bar based on overflow."""
         bbox = self.list_canvas.bbox("all")
         if not bbox:
             return
@@ -245,7 +245,7 @@ class SidebarView(tk.Frame):
                 self.sidebar_scrollbar.pack(side="right", fill="y")
 
     def _on_mousewheel(self, event):
-        """Permite deslizar la lista verticalmente con la rueda."""
+        """Allows you to scroll the list vertically with the wheel."""
         bbox = self.list_canvas.bbox("all")
         if not bbox:
             return
@@ -283,7 +283,7 @@ class SidebarView(tk.Frame):
             row = tk.Frame(self.list_container, bg=bg_color, cursor="hand2")
             row.pack(fill="x", pady=2, padx=4)
             
-            # 1. Empacar PRIMERO el botón de borrar a la derecha para que nunca sea desplazado
+            # 1. Pack the delete button on the right FIRST so it is never displaced
             btn_del = tk.Label(
                 row,
                 text="✕",
@@ -295,11 +295,11 @@ class SidebarView(tk.Frame):
             )
             btn_del.pack(side="right", padx=(0, 4))
 
-            # 2. Si el nombre es muy largo, se corta con los puntos suspensivos
+            # 2. If the name is very long, it is cut with the ellipsis
             raw_name = p["name"]
             display_name = raw_name if len(raw_name) <= 22 else raw_name[:20].rstrip() + "..."
 
-            # 3. Empacar el Label con el texto truncado en el espacio sobrante
+            # 3. Pack the Label with the text truncated in the remaining space
             name_lbl = tk.Label(
                 row,
                 text=display_name,
@@ -310,12 +310,12 @@ class SidebarView(tk.Frame):
             )
             name_lbl.pack(side="left", fill="x", expand=True, padx=(8, 2), pady=6)
 
-            # Eventos
+            # Events
             row.bind("<Button-1>", lambda e, pid=p["id"]: self._select_project(pid))
             name_lbl.bind("<Button-1>", lambda e, pid=p["id"]: self._select_project(pid))
             btn_del.bind("<Button-1>", lambda e, pid=p["id"], name=p["name"]: self._on_delete_project_clicked(pid, name))
 
-            # Propagar scroll de la rueda del ratón
+            # Spread mouse wheel scroll
             row.bind("<MouseWheel>", self._on_mousewheel)
             name_lbl.bind("<MouseWheel>", self._on_mousewheel)
             btn_del.bind("<MouseWheel>", self._on_mousewheel)          
@@ -332,7 +332,7 @@ class SidebarView(tk.Frame):
         self.on_project_selected()
 
     def _on_new_palette_clicked(self, filepath=None):
-        # 1. Si no viene del Drag & Drop, abrir el explorador de archivos
+        # 1. If it does not come from Drag & Drop, open the file explorer
         if not filepath:
             file_types = [
                 (
@@ -344,15 +344,15 @@ class SidebarView(tk.Frame):
                 title="Select an Image", filetypes=file_types
             )
 
-        # 2. Si canceló el diálogo o no hay ruta, salir
+        # 2. If you canceled the dialogue or there is no route, exit
         if not filepath:
             return
 
-        # 3. Solicitar y validar nombre de la paleta
+        # 3. Request and validate palette name
         name = "New Palette"
         while True:
             name = self._prompt_palette_name(name)
-            if name is None:  # Presionó Cancel
+            if name is None:  # Pressed Cancel
                 return
 
             clean_name = name.strip()
@@ -370,16 +370,16 @@ class SidebarView(tk.Frame):
                 )
                 continue
 
-            # Nombre válido y no duplicado
+            # Valid and non-duplicated name
             break
 
-        # 4. Crear el proyecto
+        # 4. Create the project
         new_project = self.pm.create_project(name=clean_name, image_path=filepath)
 
-        # 5. NUEVO: Seleccionarlo como el proyecto activo actual
+        # 5. NEW: Select it as the current active project
         if hasattr(self.pm, "set_active_project"):
-            self.pm.set_active_project(new_project.get("id", clean_name))  # o por nombre/objeto según cómo lo maneje tu PM
-        # 6. Refrescar la UI
+            self.pm.set_active_project(new_project.get("id", clean_name))  # or by name/item depending on how your PM handles it
+        # 6. Refresh the UI
         self.refresh_list()
         
         if self.on_project_activated:

@@ -1,5 +1,5 @@
 """
-Gestor de persistencia de datos para proyectos y paletas guardadas en JSON.
+Data persistence manager for projects and palettes saved in JSON.
 """
 
 import json
@@ -18,20 +18,20 @@ class ProjectManager:
 
         self._listeners: List[Callable[[Dict[str, str]], None]] = []
         
-        # Cargar datos existentes
+        # Load existing data
         self.projects, self.theme_name, self.font_name = self._load_data()
         
-        # Si ya existen proyectos previos, seleccionamos el más reciente
+        # If there are already previous projects, we select the most recent
         if self.projects:
             self.active_project_id = self.projects[0]["id"]
 
     def project_name_exists(self, name: str) -> bool:
-        """Verifica si ya existe un proyecto con el mismo nombre."""
+        """Check if a project with the same name already exists."""
         normalized = name.strip().lower()
         return any(p["name"].strip().lower() == normalized for p in self.projects)
     
     def _load_data(self) -> tuple[list[dict], str, str]:
-        """Carga la lista de proyectos, el tema y la fuente configurados desde el JSON."""
+        """Loads the configured project list, theme and font from the JSON."""
         if not os.path.exists(self.filepath):
             return [], "light", "panton"
         try:
@@ -45,7 +45,7 @@ class ProjectManager:
                     content.get("font", "panton"),
                 )
 
-            # Compatibilidad
+            # Compatibility
             if isinstance(content, list):
                 return content, "dark", "panton"
 
@@ -55,7 +55,7 @@ class ProjectManager:
         return [], "dark", "panton"
 
     def _save_data(self) -> None:
-        """Guarda los proyectos y el tema actual en el JSON."""
+        """Saves the palettes(projects) and the current theme in the JSON."""
         data = {
             "projects": self.projects,
             "theme": self.theme_name,
@@ -65,7 +65,7 @@ class ProjectManager:
             json.dump(data, f, indent=4)
 
     def save_theme_preference(self, theme_name: str) -> None:
-        """Actualiza el tema actual y lo persiste en el JSON."""
+        """Updates the current theme and persists it in the JSON."""
         self.theme_name = theme_name
         self._save_data()
     
@@ -74,38 +74,38 @@ class ProjectManager:
         self._save_data()
     
     def create_project(self, name: str, image_path: str) -> dict:
-        """Crea y registra una nuevo archivo de paleta con su imagen asociada."""
+        """Create and register a new palette file with its associated image."""
         project = {
             "id": str(uuid.uuid4())[:8],
             "name": name.strip() or "Untitled Palette",
             "image_path": image_path,
-            "palette": [],  # Lista ordenada de strings HEX
+            "palette": [],  # Ordered list of HEX strings
         }
-        self.projects.insert(0, project)  # El más reciente primero
+        self.projects.insert(0, project)  # Most recent first
         self.active_project_id = project["id"]
         self._save_data()
         return project
 
     def get_all_projects(self) -> list[dict]:
-        """Devuelve la lista completa de proyectos guardados."""
+        """Returns the complete list of saved projects."""
         return self.projects
 
     def get_active_project(self) -> dict | None:
-        """Devuelve el diccionario del proyecto activo actual."""
+        """Returns the dictionary of the current active project."""
         for p in self.projects:
             if p["id"] == self.active_project_id:
                 return p
         return None
 
     def set_active_project(self, project_id: str):
-        """Establece el proyecto activo según su ID."""
+        """Sets the active project based on its ID."""
         self.active_project_id = project_id
 
     def add_color_to_active(self, hex_color: str) -> bool:
         """
-        Agrega un color a la paleta del proyecto activo.
-        Evita duplicados consecutivos o repetidos si ya existe.
-        Retorna True si fue agregado, False si ya estaba.
+        Adds a color to the active project's palette.
+        Avoid consecutive or repeated duplicates if it already exists.
+        Returns True if it was added, False if it was already there.
         """
         project = self.get_active_project()
         if not project:
@@ -119,7 +119,7 @@ class ProjectManager:
         return False
 
     def add_multiple_colors_to_active(self, hex_list: list[str]) -> int:
-        """Agrega una lista de colores al proyecto activo. Retorna cuántos se añadieron."""
+        """Adds a list of colors to the active project. Returns how many were added."""
         project = self.get_active_project()
         if not project:
             return 0
@@ -136,21 +136,21 @@ class ProjectManager:
         return added
 
     def clear_active_palette(self):
-        """Limpia los colores guardados del proyecto actual."""
+        """Clears saved colors from the current project."""
         project = self.get_active_project()
         if project:
             project["palette"] = []
             self._save_data()
 
     def delete_project(self, project_id: str):
-        """Elimina un proyecto del registro."""
+        """Delete a project from the registry."""
         self.projects = [p for p in self.projects if p["id"] != project_id]
         if self.active_project_id == project_id:
             self.active_project_id = self.projects[0]["id"] if self.projects else None
         self._save_data()
     
     def remove_color_from_active(self, hex_color: str) -> bool:
-        """Elimina un color específico de la paleta del proyecto activo."""
+        """Removes a specific color from the active project palette."""
         project = self.get_active_project()
         if not project:
             return False

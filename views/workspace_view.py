@@ -1,5 +1,5 @@
 """
-Área de trabajo: renderizado de imagen con zoom adaptativo, cuentagotas y grid de colores.
+Work area: image rendering with adaptive zoom, eyedropper and color grid.
 """
 from tkinter import ttk
 import os
@@ -25,7 +25,7 @@ class WorkspaceView(tk.Frame):
         self._setup_dnd()
 
     def _build_ui(self):
-        # 1. Barra superior de proyecto
+        # 1. Project top bar
         self.header_frame = tk.Frame(self, bg=self.tm.colors["bg"])
         self.header_frame.pack(fill="x", padx=20, pady=(16, 10))
 
@@ -38,7 +38,7 @@ class WorkspaceView(tk.Frame):
         )
         self.lbl_title.pack(side="left")
 
-        # Toast notification para 'Copied!'
+        # Toast notification for 'Copied!'
         self.lbl_feedback = tk.Label(
             self.header_frame,
             text="",
@@ -48,7 +48,7 @@ class WorkspaceView(tk.Frame):
         )
         self.lbl_feedback.pack(side="right", padx=10)
 
-        # 2. Contenedor de la Imagen / Canvas
+        # 2. Image Container / Canvas
         self.canvas_card = tk.Frame(
             self,
             bg=self.tm.colors["card_bg"],
@@ -67,11 +67,11 @@ class WorkspaceView(tk.Frame):
         self.canvas.bind("<Button-1>", self._on_canvas_clicked)
         self.canvas.bind("<Configure>", self._on_canvas_resize)
         
-        # Eventos para una lupa minimalista XD
+        # Events for a minimalist magnifying glass XD
         self.canvas.bind("<Motion>", self._on_mouse_move)
         self.canvas.bind("<Leave>", self._on_mouse_leave)
 
-        # 3. Barra de acciones (Herramientas)
+        # 3. Action Bar (Tools)
         self.toolbar_frame = tk.Frame(self, bg=self.tm.colors["bg"])
         self.toolbar_frame.pack(fill="x", padx=20, pady=(0, 8))
 
@@ -112,7 +112,7 @@ class WorkspaceView(tk.Frame):
         )
         self.btn_clear.pack(side="left")
         
-        # Button para activar o desactivar la lupa
+        # Button to activate or deactivate the magnifying glass
         self.chk_loupe = tk.Checkbutton(
             self.toolbar_frame,
             text="⌕ Loupe",
@@ -128,12 +128,12 @@ class WorkspaceView(tk.Frame):
         )
         self.chk_loupe.pack(side="left", padx=(0,0))
 
-        # 4. Contenedor Scrolleable para Swatches
+        # 4. Scrollable Container for Swatches
         self.swatches_outer = tk.Frame(self, bg=self.tm.colors["bg"], height=78)
         self.swatches_outer.pack(fill="x", padx=20, pady=(0, 10))
         self.swatches_outer.pack_propagate(False)
 
-        # Barra de desplazamiento horizontal
+        # Horizontal scroll bar
         self.swatches_scrollbar = ttk.Scrollbar(
             self.swatches_outer, orient="horizontal"
         )
@@ -148,7 +148,7 @@ class WorkspaceView(tk.Frame):
         self.swatches_scrollbar.config(command=self.swatches_canvas.xview)
 
         self.swatches_canvas.pack(side="top", fill="both", expand=True)
-        # La scrollbar se empaca debajo del canvas
+        # The scrollbar is packed below the canvas
         self.swatches_scrollbar.pack(side="bottom", fill="x")
 
         self.swatches_inner = tk.Frame(
@@ -158,11 +158,11 @@ class WorkspaceView(tk.Frame):
             (0, 0), window=self.swatches_inner, anchor="nw"
         )
 
-        # Actualizar área scrolleable y visibilidad de la barra
+        # Update scrollable area and bar visibility
         self.swatches_inner.bind("<Configure>", self._on_swatches_configure)
         self.swatches_canvas.bind("<Configure>", self._on_swatches_configure)
 
-        # Soporte para rueda del ratón
+        # Mouse wheel support
         self.swatches_canvas.bind("<MouseWheel>", self._on_mousewheel)
         self.swatches_inner.bind("<MouseWheel>", self._on_mousewheel)
 
@@ -174,7 +174,7 @@ class WorkspaceView(tk.Frame):
         content_width = bbox[2] - bbox[0]
         visible_width = self.swatches_canvas.winfo_width()
 
-        # Si el contenido cabe en la pantalla, fijar el scroll al inicio y no scrollear
+        # If the content fits on the screen, set the scroll to the beginning and do not scroll
         if content_width <= visible_width:
             self.swatches_canvas.configure(scrollregion=(0, 0, visible_width, bbox[3]))
             self.swatches_canvas.xview_moveto(0)
@@ -192,7 +192,7 @@ class WorkspaceView(tk.Frame):
         content_width = bbox[2] - bbox[0]
         visible_width = self.swatches_canvas.winfo_width()
 
-        # Solo scrollear si los elementos realmente desbordan el área visible
+        # Only scroll if elements actually overflow the visible area
         if content_width > visible_width:
             self.swatches_canvas.xview_scroll(int(-1 * (event.delta / 120)), "units")
 
@@ -225,13 +225,13 @@ class WorkspaceView(tk.Frame):
             box.pack(side="left", padx=4, pady=8)
             box.pack_propagate(False)
 
-            # Clic izquierdo para copiar
+            # Left click to copy
             box.bind("<Button-1>", lambda e, c=hex_code: self._copy_to_clipboard(c))
 
-            # Clic derecho (<Button-3>) para eliminar
+            # Right click (<Button-3>) to delete
             box.bind("<Button-3>", lambda e, c=hex_code: self._remove_single_color(c))
 
-            # Pasar el scroll si el puntero está encima de los cuadritos
+            # Scroll if the pointer is over the squares
             box.bind("<MouseWheel>", self._on_mousewheel)
 
     def load_active_project(self):
@@ -265,21 +265,21 @@ class WorkspaceView(tk.Frame):
             self._render_swatches(project.get("palette", []))
             return
         
-        # 1. Abrir la imagen primero
+        # 1. Open the image first
         from PIL import Image
         self.current_original_img = Image.open(image_path).convert("RGB")
 
-        # 2. Asegurar dimensiones geométricas de la ventana
+        # 2. Ensure geometric dimensions of the window
         self.update_idletasks()
 
-        # 3. Renderizar y adaptar al tamaño disponible (éste método ya crea la imagen en el canvas)
+        # 3. Render and adapt to the available size (this method already creates the image on the canvas)
         self._render_image_to_fit()
 
-        # 4. Renderizar la paleta de swatches
+        # 4. Render the swatches palette
         self._render_swatches(project.get("palette", []))
 
     def _on_canvas_resize(self, event):
-        """Escala de nuevo cuando la ventana cambia de tamaño o se maximiza."""
+        """Scales again when the window is resized or maximized."""
         if self.current_original_img:
             self._render_image_to_fit()
     
@@ -287,12 +287,12 @@ class WorkspaceView(tk.Frame):
         c_w = self.canvas.winfo_width()
         c_h = self.canvas.winfo_height()
 
-        # Evitar cálculos antes de que Tkinter termine de mapear la ventana
+        # Avoid calculations before Tkinter finishes mapping the window
         if c_w < 50 or c_h < 50:
             self.after(50, self._render_image_to_fit)
             return
         
-        # Margen para no tocar el borde del card
+        # Margin to avoid touching the edge of the card
         avail_w = max(20, c_w - 20)
         avail_h = max(20, c_h - 20)
 
@@ -302,7 +302,7 @@ class WorkspaceView(tk.Frame):
         new_w = max(1, int(orig_w * ratio))
         new_h = max(1, int(orig_h * ratio))
 
-        # Pixel art / sprites o upscale: mantener bordes nítidos con NEAREST
+        # Pixel art/sprites or upscale: keep sharp edges with NEAREST
         if ratio >= 1.0 or (orig_w <= 128 and orig_h <= 128):
             resampling = color_engine.Image.Resampling.NEAREST
         else:
@@ -326,7 +326,7 @@ class WorkspaceView(tk.Frame):
         if not self.current_original_img or not self.current_tk_img:
             return
 
-        # Calcular coordenadas relativas al centro de la imagen
+        # Calculate coordinates relative to the center of the image
         bbox = self.canvas.bbox("main_img")
         if not bbox:
             return
@@ -372,7 +372,7 @@ class WorkspaceView(tk.Frame):
         self.after(2200, lambda: self.lbl_feedback.config(text=""))
         
     def _on_mouse_move(self, event):
-        """Muestra una mirilla minimalista con el color y HEX en tiempo real."""
+        """Displays a minimalist peephole with real-time color and HEX."""
         if not self.loupe_enabled.get():
             return
 
@@ -386,7 +386,7 @@ class WorkspaceView(tk.Frame):
         
         x1, y1, x2, y2 = bbox
 
-        # Si el cursor está dentro de la imagen
+        # If the cursor is inside the image
         if x1 <= event.x <= x2 and y1 <= event.y <= y2:
             rel_x = event.x - x1
             rel_y = event.y - y1
@@ -394,21 +394,21 @@ class WorkspaceView(tk.Frame):
                 self.current_original_img, rel_x, rel_y, self.current_scale
             )
 
-            # Posición flotante (offset hacia arriba y a la derecha del cursor)
+            # Floating position (offset up and to the right of the cursor)
             lx = event.x + 24
             ly = event.y - 24
 
-            # Evitar que se desborde del canvas por arriba o derecha
+            # Prevent it from overflowing from the canvas at the top or right
             c_w = self.canvas.winfo_width()
             if lx + 70 > c_w:
                 lx = event.x - 70
             if ly - 20 < 0:
                 ly = event.y + 24
 
-            # Redibujar la mini-píldora
+            # Redraw the mini-pill
             self.canvas.delete("loupe")
 
-            # 1. Pastilla de fondo oscura/sutil
+            # 1. Dark/subtle background pickup
             self.canvas.create_rectangle(
                 lx, ly - 14, lx + 76, ly + 14,
                 fill="#1E201E",
@@ -417,7 +417,7 @@ class WorkspaceView(tk.Frame):
                 tags="loupe"
             )
 
-            # 2. Círculo que muestra la muestra de color
+            # 2. Circle showing color swatch
             self.canvas.create_oval(
                 lx + 5, ly - 7, lx + 19, ly + 7,
                 fill=hex_color,
@@ -426,7 +426,7 @@ class WorkspaceView(tk.Frame):
                 tags="loupe"
             )
 
-            # 3. Código HEX en texto fino
+            # 3. HEX code in fine text
             self.canvas.create_text(
                 lx + 46, ly,
                 text=hex_color.upper(),
@@ -438,16 +438,16 @@ class WorkspaceView(tk.Frame):
             self.canvas.delete("loupe")
 
     def _on_toggle_loupe(self):
-        """Limpia la mirilla si el usuario la desactiva con el cursor encima."""
+        """Clears the peephole if the user deactivates it with the cursor over it."""
         if not self.loupe_enabled.get():
             self.canvas.delete("loupe")
     
     def _on_mouse_leave(self, event=None):
-        """Oculta la lupa cuando el ratón sale del área del canvas."""
+        """Hide the magnifying glass when the mouse leaves the canvas area."""
         self.canvas.delete("loupe")
     
     def _setup_dnd(self):
-        # Registrar este frame para aceptar exclusivamente archivos
+        # Register this frame to exclusively accept files
         self.drop_target_register(DND_FILES)
         self.dnd_bind("<<Drop>>", self._on_file_drop)
 
@@ -456,6 +456,6 @@ class WorkspaceView(tk.Frame):
         if filepath.startswith("{") and filepath.endswith("}"):
             filepath = filepath[1:-1]
 
-        # Llama al callback recibido en el __init__, NO a esta misma función:
+        # Call the callback received in the __init__, NOT this same function:
         if self.on_file_dropped:
             self.on_file_dropped(filepath)

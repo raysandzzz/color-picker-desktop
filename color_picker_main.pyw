@@ -1,5 +1,5 @@
 """
-Punto de entrada principal para Color Picker & Palette Extractor.
+Main entry point for Color Picker & Palette Extractor.
 """
 
 import sys
@@ -19,11 +19,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def load_custom_font(relative_path: str):
     font_path = os.path.join(BASE_DIR, relative_path)
     if os.path.exists(font_path):
-        # 0x10 = FR_PRIVATE (solo disponible para tu proceso mientras esté abierto)
+        # 0x10 = FR_PRIVATE (only available to your process while it is open)
         ctypes.windll.gdi32.AddFontResourceExW(font_path, 0x10, 0)
 
 def get_asset_path(relative_path):
-    """Obtiene la ruta absoluta para desarrollo y para el ejecutable de PyInstaller."""
+    """Gets the absolute path for development and for the PyInstaller executable."""
     try:
         base_path = sys._MEIPASS
     except AttributeError:
@@ -34,19 +34,19 @@ load_custom_font(get_asset_path("assets/fonts/determination.ttf"))
 load_custom_font(get_asset_path("assets/fonts/Panton-Trial-Bold.ttf"))
 load_custom_font(get_asset_path("assets/fonts/Panton-Trial-Regular.ttf"))
 
-# Activar DPI awareness en Windows
+# Activate DPI awareness in Windows
 if sys.platform == "win32":
     try:
-        # Compatible con Windows 10/11
+        # Compatible with Windows 10/11
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
     except Exception:
         try:
-            # Fallback para versiones anteriores de Windows
+            # Fallback for older versions of Windows
             ctypes.windll.user32.SetProcessDPIAware()
         except Exception:
             pass
 
-# Configurar AppUserModelID para que Windows muestre el icono en la barra de tareas
+# Set AppUserModelID so that Windows displays the icon on the taskbar
 try:
     myappid = "pythonprojects.gui.colorpicker.2.0"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
@@ -64,23 +64,23 @@ class ColorPickerApp(TkinterDnD.Tk):
         
         self._set_app_icon()
         
-        # Instancia del gestor de datos
+        # Data manager instance
         self.pm = ProjectManager()
         
-        # Instancia del gestor de tema
+        # Theme manager instance
         self.tm = ThemeManager(initial_theme=self.pm.theme_name)
         
         self.configure(bg=self.tm.colors["bg"])
         
-        # Contenedor principal
+        # Main container
         self.main_container = tk.Frame(self, bg=self.tm.colors["bg"])
         self.main_container.pack(fill="both", expand=True)
 
-        # Cargar el proyecto activo inicial si existe
+        # Load the initial active project if it exists
 
         self.project_manager = ProjectManager()
 
-        # ThemeManager se encarga de los colores
+        # ThemeManager takes care of the colors
         self.tm = ThemeManager(
             initial_theme=self.project_manager.theme_name,
             on_theme_change=self.project_manager.save_theme_preference,
@@ -90,17 +90,17 @@ class ColorPickerApp(TkinterDnD.Tk):
         self._build_ui()
         
     def _build_ui(self):
-        # 1. Si ya existe un contenedor previo (por un toggle), destrúyelo
+        # 1. If a previous container already exists (by a toggle), destroy it
         if self.main_container is not None:
             self.main_container.destroy()
 
         self.configure(bg=self.tm.colors["bg"])
 
-        # 2. Crea un contenedor NUEVO colgado directamente de la ventana (self)
+        # 2. Create a NEW container hanging directly from the window (self)
         self.main_container = tk.Frame(self, bg=self.tm.colors["bg"])
         self.main_container.pack(fill="both", expand=True)
 
-        # 3. Empaca la sidebar y workspace dentro de este nuevo main_container
+        # 3. Pack the sidebar and workspace inside this new main_container
         self.sidebar = SidebarView(
             self.main_container,
             project_manager=self.pm,
@@ -122,7 +122,7 @@ class ColorPickerApp(TkinterDnD.Tk):
         self.workspace.pack(side="right", fill="both", expand=True)
 
     def _set_app_icon(self):
-        # Determinar base_dir compatible con desarrollo y con PyInstaller
+        # Determine base_dir compatible with development and PyInstaller
         try:
             base_dir = sys._MEIPASS
         except AttributeError:
@@ -138,7 +138,7 @@ class ColorPickerApp(TkinterDnD.Tk):
                 pass
         elif os.path.exists(png_path):
             try:
-                self._app_icon_img = tk.PhotoImage(file=png_path)  # Guardar referencia para evitar garbage collection
+                self._app_icon_img = tk.PhotoImage(file=png_path)  # Save reference to avoid garbage collection
                 self.iconphoto(True, self._app_icon_img)
             except Exception:
                 pass
@@ -151,16 +151,16 @@ class ColorPickerApp(TkinterDnD.Tk):
     
     def _handle_theme_toggle(self):
         self.tm.toggle_theme()
-        # 1. Avisarle al ProjectManager y guardar en el JSON de inmediato:
+        # 1. Tell the ProjectManager and save in the JSON immediately:
         self.pm.save_theme_preference(self.tm.current_theme_name)
-        # 2. Reconstruir UI:
+        # 2. Rebuild UI:
         self._build_ui()
 
     def _handle_font_toggle(self):
         self.tm.toggle_font()
-        # 1. Avisarle al ProjectManager y guardar en el JSON de inmediato:
+        # 1. Tell the ProjectManager and save in the JSON immediately:
         self.pm.save_font_preference(self.tm.current_font_name)
-        # 2. Reconstruir UI:
+        # 2. Rebuild UI:
         self._build_ui()
         
 if __name__ == "__main__":

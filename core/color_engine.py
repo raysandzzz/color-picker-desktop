@@ -1,5 +1,5 @@
 """
-Motor de procesamiento de imagen y extracción de color usando Pillow.
+Image processing and color extraction engine using Pillow.
 """
 
 from PIL import Image, ImageTk
@@ -11,25 +11,25 @@ def rgb_to_hex(r: int, g: int, b: int) -> str:
 
 def load_and_scale_image(image_path: str, max_w: int, max_h: int):
     """
-    Carga una imagen y calcula su escala óptima.
-    - Si es menor que un tercio del canvas (ej. sprite 16x16), escala con NEAREST para no difuminar.
-    - Si excede max_w o max_h, reduce proporcionalmente con LANCZOS.
-    Retorna: (PIL.Image original en RGB, PIL.Image escalada, ImageTk.PhotoImage)
+   Load an image and calculate its optimal scale.
+    -If it is less than a third of the canvas (e.g. 16x16 sprite), scale with NEAREST to avoid blurring.
+    -If it exceeds max_w or max_h, reduce proportionally with LANCZOS.
+    Return: (PIL.Image original en RGB, PIL.Image escalada, ImageTk.PhotoImage)
     """
     original = Image.open(image_path).convert("RGB")
     orig_w, orig_h = original.size
 
     scale = 1.0
 
-    # Si es muy pequeña (sprites estilo 16x16, 32x32), aumentamos nítido
+    # If it is very small (16x16, 32x32 style sprites), we increase sharpness
     if orig_w < 120 and orig_h < 120:
         factor_w = max_w // orig_w
         factor_h = max_h // orig_h
-        zoom = max(1, min(factor_w, factor_h, 8))  # Hasta un máximo de 8x
+        zoom = max(1, min(factor_w, factor_h, 8))  # Up to a maximum of 8x
         target_size = (orig_w * zoom, orig_h * zoom)
         scaled = original.resize(target_size, Image.Resampling.NEAREST)
         scale = zoom
-    # Si excede el contenedor, la reducimos manteniendo proporción
+    # If it exceeds the container, we reduce it maintaining the proportion
     elif orig_w > max_w or orig_h > max_h:
         ratio = min(max_w / orig_w, max_h / orig_h)
         target_size = (int(orig_w * ratio), int(orig_h * ratio))
@@ -45,7 +45,7 @@ def load_and_scale_image(image_path: str, max_w: int, max_h: int):
 
 def get_color_at_pixel(original_image: Image.Image, click_x: int, click_y: int, scale: float) -> str:
     """
-    Traduce las coordenadas del Canvas a las del pixel original y extrae el HEX.
+    Translates the Canvas coordinates to those of the original pixel and extracts the HEX.
     """
     if scale <= 0:
         return "#000000"
@@ -63,10 +63,10 @@ def get_color_at_pixel(original_image: Image.Image, click_x: int, click_y: int, 
 
 def extract_dominant_colors(original_image: Image.Image, num_colors: int = 8) -> list[str]:
     """
-    Extrae los colores más representativos de la imagen usando cuantización Octree.
-    Retorna una lista de cadenas HEX únicas ordenadas.
+    Extracts the most representative colors from the image using Octree quantization.
+    Returns a list of ordered unique HEX strings.
     """
-    # Muestra pequeña para procesar instantáneamente sin freeze en la GUI
+    # Small sample to process instantly without freezing in the GUI
     thumb = original_image.copy()
     thumb.thumbnail((150, 150), Image.Resampling.NEAREST)
 
