@@ -12,14 +12,12 @@ A modular desktop application built with Python and Tkinter designed for precise
 
 <br>
 
----
-
 
 ## Features
 
 - **Pixel-Level Precision:** Interactive canvas with responsive scaling and image rendering via Pillow.
 - **Drag-and-Drop Workflow:** Seamless image loading by dragging image files directly into the application workspace.
-- **Magnifying Loupe:** Real-time magnified inspection window displaying exact HEX and RGB color values.
+- **Magnifying Loupe:** Real-time magnified inspection window displaying exact HEX color values.
 - **Theme & Typography Customization:** Toggle between Light and Dark modes with support for dynamic font switching (including custom pixel font and Panton) loaded in-memory via GDI.
 - **Palette Management:** Organize, save, and persist custom palettes locally via `save.json`.
 - **Decoupled Architecture:** Clean separation of concerns between UI components (`workspace_view`, `sidebar_view`), business logic (`color_engine`), and storage (`project_manager`).
@@ -27,11 +25,12 @@ A modular desktop application built with Python and Tkinter designed for precise
 
 ---
 
+
 ## Detailed Views
 
 | Pixel Inspector | Palette Management |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/758ab103-c1e1-47f2-92c3-49adf41ebc24" alt="Loupe Preview" width="400"> | <img src="https://github.com/user-attachments/assets/f5e7d897-cf57-4402-8a26-49056ee36532" alt="Palette Preview" width="400"> |
+| <img src="https://github.com/user-attachments/assets/758ab103-c1e1-47f2-92c3-49adf41ebc24" alt="Loupe Preview" width="400"> | <img src="https://github.com/user-attachments/assets/8b6b770a-af27-4810-8a1c-58f30f3dd424" alt="Palette Preview" width="420"> |
 | *Precise coordinate picking with live HEX preview* | *Automatically generates dominant tones and manages color swatches* |
 
 ---
